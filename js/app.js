@@ -6,6 +6,7 @@ const App = (() => {
 
   let currentScreen = 'home';
   let currentMode = null; // 'local' or 'tournament'
+  let lastSharePayload = null;
 
   /**
    * Navigate to a screen
@@ -334,34 +335,65 @@ const App = (() => {
     // Push session immediately (without location)
     FirebaseSync.trackSession(sessionData);
 
-    // Step 1: Get IP-based location automatically (no permission needed, works on HTTP)
-    fetch('https://api.bigdatacloud.net/data/client-ip')
-      .then(r => r.json())
-      .then(ipData => {
-        const ip = ipData.ipString || '';
-        return fetch('https://api.bigdatacloud.net/data/ip-geolocation?ip=' + ip + '&key=bdc_4b3cf26f5b284870b1b3e38c14dcb034');
-      })
-      .then(r => r.json())
-      .then(geo => {
-        sessionData.lat = geo.location?.latitude || null;
-        sessionData.lng = geo.location?.longitude || null;
-        sessionData.city = geo.location?.city || geo.city || geo.location?.localityName || 'Unknown';
-        sessionData.country = geo.country?.name || '';
-        FirebaseSync.trackSession(sessionData);
-      })
-      .catch(() => {
-        // Fallback: try simpler IP API
-        fetch('https://ipwho.is/')
-          .then(r => r.json())
-          .then(d => {
-            sessionData.lat = d.latitude || null;
-            sessionData.lng = d.longitude || null;
-            sessionData.city = d.city || 'Unknown';
-            sessionData.country = d.country || '';
-            FirebaseSync.trackSession(sessionData);
-          })
-          .catch(() => { /* Keep as Unknown */ });
+    function enrichSessionWithLocation() {
+      fetch('https://api.bigdatacloud.net/data/client-ip')
+        .then(r => r.json())
+        .then(ipData => {
+          const ip = ipData.ipString || '';
+          return fetch('https://api.bigdatacloud.net/data/ip-geolocation?ip=' + ip + '&key=bdc_4b3cf26f5b284870b1b3e38c14dcb034');
+        })
+        .then(r => r.json())
+        .then(geo => {
+          sessionData.lat = geo.location?.latitude || null;
+          sessionData.lng = geo.location?.longitude || null;
+          sessionData.city = geo.location?.city || geo.city || geo.location?.localityName || 'Unknown';
+          sessionData.country = geo.country?.name || '';
+          FirebaseSync.trackSession(sessionData);
+        })
+        .catch(() => {
+          fetch('https://ipwho.is/')
+            .then(r => r.json())
+            .then(d => {
+              sessionData.lat = d.latitude || null;
+              sessionData.lng = d.longitude || null;
+              sessionData.city = d.city || 'Unknown';
+              sessionData.country = d.country || '';
+              FirebaseSync.trackSession(sessionData);
+            })
+            .catch(() => { /* Keep as Unknown */ });
+        });
+    }
+
+    function showPrivacyConsent() {
+      if (localStorage.getItem('location_analytics_consent')) return;
+      const box = document.createElement('div');
+      box.className = 'privacy-consent';
+      box.innerHTML = `
+        <div>
+          <strong>Help improve live cricket scoring</strong>
+          <span>Allow approximate city-level analytics for the admin dashboard?</span>
+        </div>
+        <div class="privacy-actions">
+          <button data-consent="allow">Allow</button>
+          <button data-consent="deny">Not now</button>
+        </div>
+      `;
+      document.body.appendChild(box);
+      box.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-consent]');
+        if (!btn) return;
+        const value = btn.dataset.consent;
+        localStorage.setItem('location_analytics_consent', value);
+        box.remove();
+        if (value === 'allow') enrichSessionWithLocation();
       });
+    }
+
+    if (localStorage.getItem('location_analytics_consent') === 'allow') {
+      enrichSessionWithLocation();
+    } else {
+      showPrivacyConsent();
+    }
 
     // Clean up session on page unload
     window.addEventListener('beforeunload', () => {
@@ -370,7 +402,41 @@ const App = (() => {
 
     // Start listening globally for active matches to show on Home Screen
     const matchesContainer = document.getElementById('live-matches-container');
+    const joinCodeInput = document.getElementById('join-match-code');
+    const joinCodeError = document.getElementById('join-code-error');
+    const joinCodeBtn = document.getElementById('btn-join-code');
     let globalMatchesMap = {};
+    let pendingJoinCode = (new URLSearchParams(window.location.search).get('match') || '').trim();
+
+    function matchCodeOf(match) {
+      return (match.matchCode || (match.id || '').slice(0, 6)).toUpperCase();
+    }
+
+    function findMatchByCode(code) {
+      const normalized = (code || '').trim().toUpperCase();
+      if (!normalized) return null;
+      return Object.values(globalMatchesMap).find(match =>
+        match.id === code ||
+        match.id?.toUpperCase() === normalized ||
+        matchCodeOf(match) === normalized ||
+        match.id?.toUpperCase().startsWith(normalized)
+      ) || null;
+    }
+
+    function joinLiveMatch(matchState) {
+      if (!matchState) return false;
+      const runJoin = () => {
+        if (matchState.mode === 'local') {
+          FirebaseSync.updateSessionMatch(sessionId, matchState.teams[0].name + ' vs ' + matchState.teams[1].name);
+          LocalMode.joinLiveMatch(matchState);
+        } else if (matchState.mode === 'tournament') {
+          FirebaseSync.updateSessionMatch(sessionId, matchState.teams[0].name + ' vs ' + matchState.teams[1].name);
+          TournamentMode.joinLiveMatch(matchState);
+        }
+      };
+      showCinematicIntro(matchState, runJoin);
+      return true;
+    }
 
     FirebaseSync.listenAllMatches((matches) => {
       if (!matchesContainer) return;
@@ -409,6 +475,7 @@ const App = (() => {
         const pinAction = isPinned ? 'unpin-match' : 'pin-match';
         const pinText   = isPinned ? '🛑 Unpin Match' : '📌 Pin This Match';
         const descText  = isPinned ? '📌 Pinned ✓'   : 'Tap to View Score';
+        const codeText  = matchCodeOf(match);
 
         html += `
           <div class="live-match-banner" data-match-id="${match.id}" style="display: block; margin-bottom: 12px; cursor: pointer;">
@@ -419,12 +486,36 @@ const App = (() => {
                <button class="dropdown-item" data-action="${pinAction}">${pinText}</button>
             </div>
             <div class="live-match-teams">${teamAtxt} vs ${teamBtxt}</div>
-            <div class="live-match-desc">${descText}</div>
+            <div class="live-match-desc">${descText} · Code ${codeText}</div>
           </div>
         `;
       });
       matchesContainer.innerHTML = html;
+
+      if (pendingJoinCode) {
+        const match = findMatchByCode(pendingJoinCode);
+        if (match) {
+          pendingJoinCode = '';
+          joinLiveMatch(match);
+        }
+      }
     });
+
+    if (joinCodeBtn && joinCodeInput) {
+      joinCodeBtn.addEventListener('click', () => {
+        const match = findMatchByCode(joinCodeInput.value);
+        if (match) {
+          joinCodeError.textContent = '';
+          joinCodeInput.value = '';
+          joinLiveMatch(match);
+        } else {
+          joinCodeError.textContent = 'No live match found for this code.';
+        }
+      });
+      joinCodeInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') joinCodeBtn.click();
+      });
+    }
 
     if (matchesContainer) {
       matchesContainer.addEventListener('click', (e) => {
@@ -470,17 +561,7 @@ const App = (() => {
         }
 
         // Only reach here when tapping the card directly OR 'view-match'
-        const joinMatch = () => {
-          if (matchState.mode === 'local') {
-            FirebaseSync.updateSessionMatch(sessionId, matchState.teams[0].name + ' vs ' + matchState.teams[1].name);
-            LocalMode.joinLiveMatch(matchState);
-          } else if (matchState.mode === 'tournament') {
-            FirebaseSync.updateSessionMatch(sessionId, matchState.teams[0].name + ' vs ' + matchState.teams[1].name);
-            TournamentMode.joinLiveMatch(matchState);
-          }
-        };
-
-        showCinematicIntro(matchState, joinMatch);
+        joinLiveMatch(matchState);
       });
     }
 
@@ -584,14 +665,14 @@ const App = (() => {
     document.getElementById('tournament-auth-banner').addEventListener('click', () => showAuthModal('tournament'));
 
     // ---- Auth modal ----
-    document.getElementById('auth-confirm').addEventListener('click', () => {
+    document.getElementById('auth-confirm').addEventListener('click', async () => {
       const code = document.getElementById('auth-code-input').value.trim();
       let success = false;
 
       if (currentMode === 'local') {
-        success = LocalMode.authenticate(code);
+        success = await LocalMode.authenticate(code);
       } else if (currentMode === 'tournament') {
-        success = TournamentMode.authenticate(code);
+        success = await TournamentMode.authenticate(code);
       }
 
       if (success) {
@@ -614,14 +695,14 @@ const App = (() => {
     document.getElementById('btn-tournament-delete').addEventListener('click', () => showDeleteModal());
 
     // ---- Delete modal ----
-    document.getElementById('delete-confirm').addEventListener('click', () => {
+    document.getElementById('delete-confirm').addEventListener('click', async () => {
       const code = document.getElementById('delete-code-input').value.trim();
       let success = false;
 
       if (currentMode === 'local') {
-        success = LocalMode.deleteMatch(code);
+        success = await LocalMode.deleteMatch(code);
       } else if (currentMode === 'tournament') {
-        success = TournamentMode.deleteMatch(code);
+        success = await TournamentMode.deleteMatch(code);
       }
 
       if (success) {
@@ -643,6 +724,14 @@ const App = (() => {
     // ---- Home buttons ----
     document.getElementById('btn-local-home').addEventListener('click', () => navigate('home'));
     document.getElementById('btn-tournament-home').addEventListener('click', () => navigate('home'));
+    document.getElementById('btn-local-share').addEventListener('click', () => showShareModal(LocalMode.getState(), false));
+    document.getElementById('btn-tournament-share').addEventListener('click', () => showShareModal(TournamentMode.getState(), false));
+    document.getElementById('btn-final-share').addEventListener('click', () => {
+      showShareModal(LocalMode.getState() || TournamentMode.getState(), true);
+    });
+    document.getElementById('share-close').addEventListener('click', () => hideModal('share-modal'));
+    document.getElementById('share-copy').addEventListener('click', copyShareLink);
+    document.getElementById('share-whatsapp').addEventListener('click', openShareWhatsApp);
 
     // ---- Handle auth code input Enter key ----
     document.getElementById('auth-code-input').addEventListener('keydown', (e) => {
@@ -678,6 +767,58 @@ const App = (() => {
    */
   function hideModal(id) {
     document.getElementById(id).classList.remove('active');
+  }
+
+  function matchCodeOf(match) {
+    return (match?.matchCode || (match?.id || '').slice(0, 6)).toUpperCase();
+  }
+
+  function matchLinkOf(match) {
+    const url = new URL(window.location.origin + window.location.pathname);
+    url.searchParams.set('match', match?.id || '');
+    return url.toString();
+  }
+
+  function shareTextOf(match, isResult) {
+    if (!match?.teams?.length) return 'Quick Cricket Score live match';
+    const teamA = match.teams[0];
+    const teamB = match.teams[1];
+    if (isResult || match.isMatchOver) {
+      return `${match.winMessage || 'Match result'}\n${teamA.name}: ${teamA.runs}/${teamA.wickets}\n${teamB.name}: ${teamB.runs}/${teamB.wickets}\nQuick Cricket Score`;
+    }
+    const batting = match.teams[match.currentInnings || 0] || teamA;
+    return `Live cricket score: ${teamA.name} vs ${teamB.name}\n${batting.name}: ${batting.runs}/${batting.wickets} (${CricketEngine.getOversDisplay(match)} ov)\nCode: ${matchCodeOf(match)}\n${matchLinkOf(match)}`;
+  }
+
+  function showShareModal(match, isResult) {
+    if (!match?.id) {
+      showToast('No active match to share');
+      return;
+    }
+    const link = matchLinkOf(match);
+    const text = shareTextOf(match, isResult);
+    lastSharePayload = { link, text };
+    document.getElementById('share-modal-sub').textContent = isResult ? 'Share the final result' : 'Send this link or code to viewers';
+    document.getElementById('share-code-text').textContent = matchCodeOf(match);
+    document.getElementById('share-link-input').value = link;
+    document.getElementById('share-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(link)}`;
+    document.getElementById('share-modal').classList.add('active');
+  }
+
+  async function copyShareLink() {
+    if (!lastSharePayload) return;
+    try {
+      await navigator.clipboard.writeText(lastSharePayload.link);
+      showToast('Link copied');
+    } catch(e) {
+      document.getElementById('share-link-input').select();
+      showToast('Select and copy the link');
+    }
+  }
+
+  function openShareWhatsApp() {
+    if (!lastSharePayload) return;
+    window.open(`https://wa.me/?text=${encodeURIComponent(lastSharePayload.text)}`, '_blank', 'noopener');
   }
 
   /**

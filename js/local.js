@@ -11,6 +11,23 @@ const LocalMode = (() => {
   // DOM references (lazy)
   const el = (id) => document.getElementById(id);
 
+  async function hashSecret(value) {
+    if (!window.crypto?.subtle) return value;
+    const data = new TextEncoder().encode(value);
+    const hash = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  function createMatchCode() {
+    return Math.random().toString(36).slice(2, 8).toUpperCase();
+  }
+
+  function escapeHTML(value) {
+    return String(value || '').replace(/[&<>"']/g, ch => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[ch]));
+  }
+
   /**
    * Initialize setup form
    */
@@ -55,13 +72,14 @@ const LocalMode = (() => {
   /**
    * Start a new local match
    */
-  function startMatch() {
+  async function startMatch() {
     const teamA = el('local-teamA').value.trim() || 'Team A';
     const teamB = el('local-teamB').value.trim() || 'Team B';
     const overs = parseInt(el('local-overs').value) || 5;
     const players = parseInt(el('local-players').value) || 8;
     const batFirst = parseInt(el('local-bat-first').value) || 0;
     const hostPassword = el('local-host-password').value.trim();
+    const hostPasswordHash = await hashSecret(hostPassword);
 
     const noBallRunEnabled = el('toggle-noball-run') ? el('toggle-noball-run').checked : false;
     const wideRunEnabled = el('toggle-wide-run') ? el('toggle-wide-run').checked : false;
@@ -72,7 +90,8 @@ const LocalMode = (() => {
       totalOvers: overs,
       playersPerTeam: players,
       batFirst: batFirst,
-      hostPassword: hostPassword,
+      hostPasswordHash: hostPasswordHash,
+      matchCode: createMatchCode(),
       noBallRunEnabled: noBallRunEnabled,
       wideRunEnabled: wideRunEnabled
     });
@@ -484,7 +503,13 @@ const LocalMode = (() => {
     const scoresHTML = matchState.teams.map(t => {
       const overs = Math.floor(t.balls / 6);
       const balls = t.balls % 6;
-      return `<div class="final-score-line"><span>${t.name}</span> — ${t.runs}/${t.wickets} (${overs}.${balls} overs)</div>`;
+      const recentOvers = (t.overSummaries || []).slice(-6);
+      const firstOverNumber = Math.max(1, (t.overSummaries || []).length - recentOvers.length + 1);
+      const overRows = recentOvers.map((over, idx) => {
+        const ballsHtml = over.map(b => `<span class="mini-ball ${b.class || ''}">${escapeHTML(b.label)}</span>`).join('');
+        return `<div class="scorecard-over"><span>Over ${firstOverNumber + idx}</span><div>${ballsHtml}</div></div>`;
+      }).join('');
+      return `<div class="final-score-line"><span>${escapeHTML(t.name)}</span> — ${t.runs}/${t.wickets} (${overs}.${balls} overs)</div>${overRows}`;
     }).join('');
     el('final-scores').innerHTML = scoresHTML;
 
@@ -502,6 +527,8 @@ const LocalMode = (() => {
   function updateAuthBanner() {
     const banner = el('local-auth-banner');
     if (!banner) return;
+    const container = document.querySelector('#screen-local-match .match-container');
+    if (container) container.classList.toggle('viewer-mode', !isAuthenticated);
     const icon = banner.querySelector('.auth-corner-icon');
     if (isAuthenticated) {
       banner.classList.add('authenticated');
@@ -517,8 +544,9 @@ const LocalMode = (() => {
   /**
    * Authenticate device
    */
-  function authenticate(code) {
-    if (matchState && code === matchState.hostPassword) {
+  async function authenticate(code) {
+    const codeHash = await hashSecret(code);
+    if (matchState && (codeHash === matchState.hostPasswordHash || code === matchState.hostPassword)) {
       isAuthenticated = true;
       updateAuthBanner();
       // Sync current state
@@ -533,8 +561,9 @@ const LocalMode = (() => {
   /**
    * Delete match (clears Firebase and local state)
    */
-  function deleteMatch(code) {
-    if (matchState && code === matchState.hostPassword) {
+  async function deleteMatch(code) {
+    const codeHash = await hashSecret(code);
+    if (matchState && (codeHash === matchState.hostPasswordHash || code === matchState.hostPassword)) {
       if (isAuthenticated) {
         if (matchListener) {
           FirebaseSync.removeMatchCallback(matchListener);

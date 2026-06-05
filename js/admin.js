@@ -14,10 +14,10 @@ const AdminPanel = (() => {
     appId: "1:346158439568:web:8df1ee903ed354c597cc15"
   };
 
-  // Admin credentials (SHA-256 hashed)
-  // ID: "sanuwar" → hash, Password: "sanuwar456" → hash
-  const ADMIN_ID_HASH = '';
-  const ADMIN_PASS_HASH = '';
+  // Client-side hashing only hides credentials from casual source reading.
+  // Move this to Firebase Auth + database rules before treating admin as secure.
+  const ADMIN_ID_HASH = '5d13c013835a2faa367436b56fd0320c8ed472e65b809c848e5c28badae007a0';
+  const ADMIN_PASS_HASH = 'd9e7a14204bcdf7cdb587fa8b21f8c9921ab8829f2da7f367879e01917152aa8';
 
   let db = null;
   let isLoggedIn = false;
@@ -42,9 +42,6 @@ const AdminPanel = (() => {
     // Firebase
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     db = firebase.database();
-
-    // Pre-compute hashes on first load (console helper)
-    precomputeHashes();
 
     // Login form
     document.getElementById('login-form').addEventListener('submit', handleLogin);
@@ -83,12 +80,6 @@ const AdminPanel = (() => {
     setInterval(updateClock, 1000);
   }
 
-  async function precomputeHashes() {
-    // Precompute and store in closure for login checks
-    AdminPanel._idHash = await sha256('sanuwar');
-    AdminPanel._passHash = await sha256('sanuwar456');
-  }
-
   // ===== Login =====
   async function handleLogin(e) {
     e.preventDefault();
@@ -104,7 +95,7 @@ const AdminPanel = (() => {
     const idHash = await sha256(id);
     const passHash = await sha256(pass);
 
-    if (idHash === AdminPanel._idHash && passHash === AdminPanel._passHash) {
+    if (idHash === ADMIN_ID_HASH && passHash === ADMIN_PASS_HASH) {
       isLoggedIn = true;
       sessionStorage.setItem('admin_token', Date.now().toString(36));
       errorEl.textContent = '';
@@ -342,80 +333,26 @@ const AdminPanel = (() => {
     const state = controlMatchState;
     if (state.isMatchOver && action !== 'undo') return;
 
-    const team = state.teams[state.currentInnings];
-
     switch(action) {
-      case '0': addRunsDirect(team, 0); break;
-      case '1': addRunsDirect(team, 1); break;
-      case '2': addRunsDirect(team, 2); break;
-      case '3': addRunsDirect(team, 3); break;
-      case '4': addRunsDirect(team, 4); break;
-      case '6': addRunsDirect(team, 6); break;
-      case 'wide':
-        team.runs = (team.runs || 0) + 1;
-        team.currentOver = team.currentOver || [];
-        team.currentOver.push({ label: 'WD', class: 'wide' });
-        break;
-      case 'noball':
-        team.runs = (team.runs || 0) + 1;
-        team.currentOver = team.currentOver || [];
-        team.currentOver.push({ label: 'NB', class: 'noball' });
-        break;
-      case 'out':
-        team.wickets = (team.wickets || 0) + 1;
-        team.balls = (team.balls || 0) + 1;
-        team.currentOver = team.currentOver || [];
-        team.currentOver.push({ label: 'W', class: 'wicket' });
-        checkOverAdmin(state);
-        break;
-      case 'undo':
-        // Simple undo: remove last ball from current over
-        if (team.currentOver && team.currentOver.length > 0) {
-          const last = team.currentOver.pop();
-          if (last.class === 'wicket') {
-            team.wickets = Math.max(0, (team.wickets || 0) - 1);
-            team.balls = Math.max(0, (team.balls || 0) - 1);
-          } else if (last.class === 'wide' || last.class === 'noball') {
-            team.runs = Math.max(0, (team.runs || 0) - 1);
-          } else {
-            const val = parseInt(last.label) || 0;
-            team.runs = Math.max(0, (team.runs || 0) - val);
-            team.balls = Math.max(0, (team.balls || 0) - 1);
-          }
-        }
-        break;
+      case '0': CricketEngine.addRuns(state, 0); state.lastEvent = { type: 'run0', timestamp: Date.now() }; break;
+      case '1': CricketEngine.addRuns(state, 1); state.lastEvent = { type: 'run1', timestamp: Date.now() }; break;
+      case '2': CricketEngine.addRuns(state, 2); state.lastEvent = { type: 'run2', timestamp: Date.now() }; break;
+      case '3': CricketEngine.addRuns(state, 3); state.lastEvent = { type: 'run3', timestamp: Date.now() }; break;
+      case '4': CricketEngine.addRuns(state, 4); state.lastEvent = { type: 'four', timestamp: Date.now() }; break;
+      case '6': CricketEngine.addRuns(state, 6); state.lastEvent = { type: 'six', timestamp: Date.now() }; break;
+      case 'wide': CricketEngine.addWide(state, 0); state.lastEvent = { type: 'wide', timestamp: Date.now() }; break;
+      case 'noball': CricketEngine.addNoBall(state, 0); state.lastEvent = { type: 'noball', timestamp: Date.now() }; break;
+      case 'out': CricketEngine.addWicket(state); state.lastEvent = { type: 'out', timestamp: Date.now() }; break;
+      case 'undo': CricketEngine.undo(state); break;
       default: return;
     }
 
     // Sync to Firebase directly
+    if (state.isMatchOver && !state.historySaved) {
+      state.historySaved = true;
+      saveMatchHistory(state);
+    }
     syncControlMatch(state);
-  }
-
-  function addRunsDirect(team, runs) {
-    team.runs = (team.runs || 0) + runs;
-    team.balls = (team.balls || 0) + 1;
-    const label = runs === 0 ? '0' : String(runs);
-    let cls = '';
-    if (runs === 4) cls = 'four';
-    else if (runs === 6) cls = 'six';
-    team.currentOver = team.currentOver || [];
-    team.currentOver.push({ label, class: cls });
-
-    // Check over complete
-    if (team.balls > 0 && team.balls % 6 === 0) {
-      team.overSummaries = team.overSummaries || [];
-      team.overSummaries.push([...team.currentOver]);
-      team.currentOver = [];
-    }
-  }
-
-  function checkOverAdmin(state) {
-    const team = state.teams[state.currentInnings];
-    if (team.balls > 0 && team.balls % 6 === 0) {
-      team.overSummaries = team.overSummaries || [];
-      team.overSummaries.push([...team.currentOver]);
-      team.currentOver = [];
-    }
   }
 
   function syncControlMatch(state) {
@@ -423,6 +360,22 @@ const AdminPanel = (() => {
     const syncData = { ...state };
     delete syncData.history;
     db.ref('matches/current/' + state.id).set(syncData);
+  }
+
+  function saveMatchHistory(state) {
+    if (!db || !state) return;
+    const historyData = {
+      teamA: state.teams[0]?.name || 'Team A',
+      teamB: state.teams[1]?.name || 'Team B',
+      runsA: state.teams[0]?.runs || 0,
+      wicketsA: state.teams[0]?.wickets || 0,
+      runsB: state.teams[1]?.runs || 0,
+      wicketsB: state.teams[1]?.wickets || 0,
+      overs: state.totalOvers || 5,
+      winner: state.winner || 'Unknown',
+      date: Date.now()
+    };
+    db.ref('score/history').push(historyData);
   }
 
   function handleResetMatch() {
@@ -531,9 +484,7 @@ const AdminPanel = (() => {
   return {
     init,
     openControlModal,
-    adminDeleteMatch,
-    _idHash: '',
-    _passHash: ''
+    adminDeleteMatch
   };
 })();
 

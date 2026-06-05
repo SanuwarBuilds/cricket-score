@@ -44,6 +44,7 @@ const CricketEngine = (() => {
       winner: null,
       winMessage: '',
       target: null,
+      matchCode: config.matchCode || '',
       // Extra run tracking
       extras: 0,
       // Toggle flags (set from setup screen)
@@ -76,7 +77,7 @@ const CricketEngine = (() => {
         }
       ],
       // Security
-      hostPassword: config.hostPassword || ''
+      hostPasswordHash: config.hostPasswordHash || ''
     };
   }
 
@@ -167,6 +168,7 @@ const CricketEngine = (() => {
     const bonusRuns = extraRuns || 0;
     const totalRuns = 1 + bonusRuns;
     team.runs += totalRuns;
+    state.extras = (state.extras || 0) + totalRuns;
     const label = bonusRuns > 0 ? `WD+${bonusRuns}` : 'WD';
     team.currentOver.push({ label, class: 'wide' });
     team.ballHistory.push({ label, class: 'wide', type: 'wide', value: totalRuns });
@@ -189,6 +191,7 @@ const CricketEngine = (() => {
     const bonusRuns = extraRuns || 0;
     const totalRuns = 1 + bonusRuns;
     team.runs += totalRuns;
+    state.extras = (state.extras || 0) + totalRuns;
     const label = bonusRuns > 0 ? `NB+${bonusRuns}` : 'NB';
     team.currentOver.push({ label, class: 'noball' });
     team.ballHistory.push({ label, class: 'noball', type: 'noball', value: totalRuns });

@@ -42,6 +42,15 @@
       
       <!-- Live Matches Container -->
       <div id="live-matches-container" class="live-matches-container"></div>
+
+      <div class="join-code-card">
+        <label for="join-match-code">Join live match</label>
+        <div class="join-code-row">
+          <input type="text" id="join-match-code" maxlength="12" placeholder="Enter code">
+          <button id="btn-join-code" type="button">Join</button>
+        </div>
+        <p id="join-code-error"></p>
+      </div>
       
       <div class="mode-buttons">
         <button class="mode-btn local-btn" id="btn-local-mode" data-navigate="local-setup">
@@ -346,6 +355,7 @@
 
       <!-- Bottom Actions -->
       <div class="match-actions">
+        <button class="action-btn share-btn" id="btn-local-share">🔗 Share Match</button>
         <button class="action-btn delete-btn" id="btn-local-delete">🗑️ Delete Match</button>
         <button class="action-btn" id="btn-local-home">🏠 Home</button>
       </div>
@@ -493,6 +503,7 @@
 
       <!-- Bottom Actions -->
       <div class="match-actions">
+        <button class="action-btn share-btn" id="btn-tournament-share">🔗 Share Match</button>
         <button class="action-btn delete-btn" id="btn-tournament-delete">🗑️ Delete Match</button>
         <button class="action-btn" id="btn-tournament-home">🏠 Home</button>
       </div>
@@ -537,6 +548,7 @@
           <span>New Match</span>
           <div class="ripple-container"></div>
         </button>
+        <button class="action-btn share-btn" id="btn-final-share" style="margin-top: 12px;">📣 Share Result</button>
         <div class="creator-credit" style="margin-top: 16px;">Made ❤️ by <strong>SANUWAR HUSSAIN</strong><a href="https://www.instagram.com/iam.sanuwar?igsh=Z2kyODk1YmppY3pj&utm_source=qr" target="_blank" class="insta-follow-btn"><svg class="insta-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>Follow on Instagram</a></div>
       </div>
     </div>
@@ -567,6 +579,25 @@
       <div class="modal-actions">
         <button class="modal-btn cancel" id="delete-cancel">Cancel</button>
         <button class="modal-btn confirm danger" id="delete-confirm">Delete Match</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SHARE MODAL ==================== -->
+  <div class="modal-overlay" id="share-modal">
+    <div class="modal share-modal">
+      <h3>🔗 Share Live Match</h3>
+      <p id="share-modal-sub">Send this link or code to viewers</p>
+      <img id="share-qr-img" class="share-qr-img" alt="Match QR code">
+      <div class="share-code-row">
+        <span>Code</span>
+        <strong id="share-code-text">------</strong>
+      </div>
+      <input type="text" id="share-link-input" class="modal-input" readonly>
+      <div class="modal-actions">
+        <button class="modal-btn cancel" id="share-close">Close</button>
+        <button class="modal-btn" id="share-copy">Copy Link</button>
+        <button class="modal-btn confirm" id="share-whatsapp">WhatsApp</button>
       </div>
     </div>
   </div>

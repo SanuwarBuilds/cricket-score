@@ -9,6 +9,23 @@ const TournamentMode = (() => {
 
   const el = (id) => document.getElementById(id);
 
+  async function hashSecret(value) {
+    if (!window.crypto?.subtle) return value;
+    const data = new TextEncoder().encode(value);
+    const hash = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  function createMatchCode() {
+    return Math.random().toString(36).slice(2, 8).toUpperCase();
+  }
+
+  function escapeHTML(value) {
+    return String(value || '').replace(/[&<>"']/g, ch => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[ch]));
+  }
+
   /**
    * Initialize tournament setup
    */
@@ -84,7 +101,7 @@ const TournamentMode = (() => {
   /**
    * Start a tournament match
    */
-  function startMatch() {
+  async function startMatch() {
     const tournamentName = el('tournament-name').value.trim() || 'Tournament';
     const teamA = el('tournament-teamA').value.trim() || 'Team A';
     const teamB = el('tournament-teamB').value.trim() || 'Team B';
@@ -93,6 +110,7 @@ const TournamentMode = (() => {
     const overs = parseInt(el('tournament-overs').value) || 10;
     const players = parseInt(el('tournament-players').value) || 11;
     const hostPassword = el('tournament-host-password').value.trim();
+    const hostPasswordHash = await hashSecret(hostPassword);
 
     // Gather player names
     const playersA = [];
@@ -114,7 +132,8 @@ const TournamentMode = (() => {
       playersA, playersB,
       tournamentName,
       batFirst: batFirst,
-      hostPassword: hostPassword,
+      hostPasswordHash: hostPasswordHash,
+      matchCode: createMatchCode(),
       // Tournament always counts Wide & NoBall runs (+1 each, no pending mode)
       wideRunEnabled: true,
       noBallRunEnabled: true
@@ -398,9 +417,9 @@ const TournamentMode = (() => {
       return;
     }
 
-    let html = `<h4>${battingTeam.name} — Squad</h4><div class="player-list-grid">`;
+    let html = `<h4>${escapeHTML(battingTeam.name)} — Squad</h4><div class="player-list-grid">`;
     players.forEach((p, i) => {
-      html += `<div class="player-item"><span class="player-num">${i + 1}.</span> ${p}</div>`;
+      html += `<div class="player-item"><span class="player-num">${i + 1}.</span> ${escapeHTML(p)}</div>`;
     });
     html += '</div>';
     section.innerHTML = html;
@@ -417,7 +436,13 @@ const TournamentMode = (() => {
     const scoresHTML = matchState.teams.map(t => {
       const o = Math.floor(t.balls / 6);
       const b = t.balls % 6;
-      return `<div class="final-score-line"><span>${t.name}</span> — ${t.runs}/${t.wickets} (${o}.${b} overs)</div>`;
+      const recentOvers = (t.overSummaries || []).slice(-6);
+      const firstOverNumber = Math.max(1, (t.overSummaries || []).length - recentOvers.length + 1);
+      const overRows = recentOvers.map((over, idx) => {
+        const ballsHtml = over.map(ball => `<span class="mini-ball ${ball.class || ''}">${escapeHTML(ball.label)}</span>`).join('');
+        return `<div class="scorecard-over"><span>Over ${firstOverNumber + idx}</span><div>${ballsHtml}</div></div>`;
+      }).join('');
+      return `<div class="final-score-line"><span>${escapeHTML(t.name)}</span> — ${t.runs}/${t.wickets} (${o}.${b} overs)</div>${overRows}`;
     }).join('');
     document.getElementById('final-scores').innerHTML = scoresHTML;
 
@@ -431,6 +456,8 @@ const TournamentMode = (() => {
   function updateAuthBanner() {
     const banner = el('tournament-auth-banner');
     if (!banner) return;
+    const container = document.querySelector('#screen-tournament-match .match-container');
+    if (container) container.classList.toggle('viewer-mode', !isAuthenticated);
     const icon = banner.querySelector('.auth-corner-icon');
     if (isAuthenticated) {
       banner.classList.add('authenticated');
@@ -443,8 +470,9 @@ const TournamentMode = (() => {
     }
   }
 
-  function authenticate(code) {
-    if (matchState && code === matchState.hostPassword) {
+  async function authenticate(code) {
+    const codeHash = await hashSecret(code);
+    if (matchState && (codeHash === matchState.hostPasswordHash || code === matchState.hostPassword)) {
       isAuthenticated = true;
       updateAuthBanner();
       if (matchState) FirebaseSync.syncState(matchState);
@@ -453,8 +481,9 @@ const TournamentMode = (() => {
     return false;
   }
 
-  function deleteMatch(code) {
-    if (matchState && code === matchState.hostPassword) {
+  async function deleteMatch(code) {
+    const codeHash = await hashSecret(code);
+    if (matchState && (codeHash === matchState.hostPasswordHash || code === matchState.hostPassword)) {
       if (isAuthenticated) {
         if (matchListener) {
           FirebaseSync.removeMatchCallback(matchListener);
