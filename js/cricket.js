@@ -15,21 +15,29 @@ const CricketEngine = (() => {
     const teamAConfig = batFirst === 0 ? {
       name: config.teamA,
       captain: config.captainA || '',
-      players: config.playersA || []
+      players: config.playersA || [],
+      color: config.colorA || '#3b82f6',
+      emblem: config.logoA || '🦁'
     } : {
       name: config.teamB,
       captain: config.captainB || '',
-      players: config.playersB || []
+      players: config.playersB || [],
+      color: config.colorB || '#ef4444',
+      emblem: config.logoB || '🐯'
     };
 
     const teamBConfig = batFirst === 0 ? {
       name: config.teamB,
       captain: config.captainB || '',
-      players: config.playersB || []
+      players: config.playersB || [],
+      color: config.colorB || '#ef4444',
+      emblem: config.logoB || '🐯'
     } : {
       name: config.teamA,
       captain: config.captainA || '',
-      players: config.playersA || []
+      players: config.playersA || [],
+      color: config.colorA || '#3b82f6',
+      emblem: config.logoA || '🦁'
     };
 
     return {
@@ -55,6 +63,8 @@ const CricketEngine = (() => {
           name: teamAConfig.name,
           captain: teamAConfig.captain,
           players: teamAConfig.players,
+          color: teamAConfig.color,
+          emblem: teamAConfig.emblem,
           runs: 0,
           wickets: 0,
           balls: 0,
@@ -67,6 +77,8 @@ const CricketEngine = (() => {
           name: teamBConfig.name,
           captain: teamBConfig.captain,
           players: teamBConfig.players,
+          color: teamBConfig.color,
+          emblem: teamBConfig.emblem,
           runs: 0,
           wickets: 0,
           balls: 0,

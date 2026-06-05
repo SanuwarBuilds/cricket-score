@@ -98,18 +98,69 @@
       <!-- Glass Setup Card -->
       <form id="local-setup-form" class="lsetup-card">
 
-        <!-- Row 1: Teams -->
+        <!-- Section 1: Teams Config -->
+        <div class="setup-section-title">👥 Team Config</div>
         <div class="lsetup-grid-2">
-          <div class="lsetup-field">
-            <label class="lsetup-label">🔵 Team A</label>
-            <input type="text" id="local-teamA" class="lsetup-input" placeholder="Team A" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z\s]/g, '')">
+          <!-- Team A Config Card -->
+          <div class="team-setup-card team-a-card">
+            <div class="lsetup-field">
+              <label class="lsetup-label">🔵 Team A Name</label>
+              <input type="text" id="local-teamA" class="lsetup-input" placeholder="TEAM A" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z\s]/g, '')">
+            </div>
+            <div class="team-customizer-row" style="display: flex; gap: 6px; margin-top: 6px;">
+              <div class="lsetup-field" style="flex: 1;">
+                <label class="lsetup-label">Jersey</label>
+                <div class="color-picker-wrapper">
+                  <input type="color" id="local-colorA" value="#3b82f6" class="jersey-color-input">
+                </div>
+              </div>
+              <div class="lsetup-field" style="flex: 2;">
+                <label class="lsetup-label">Emblem</label>
+                <select id="local-logoA" class="lsetup-input lsetup-select">
+                  <option value="🦁">🦁 Lions</option>
+                  <option value="⚡">⚡ Chargers</option>
+                  <option value="🔥">🔥 Strikers</option>
+                  <option value="👑">👑 Kings</option>
+                  <option value="🐯">🐯 Tigers</option>
+                  <option value="🦅">🦅 Eagles</option>
+                  <option value="🏏">🏏 Batsmen</option>
+                </select>
+              </div>
+            </div>
           </div>
-          <div class="lsetup-field">
-            <label class="lsetup-label">🔴 Team B</label>
-            <input type="text" id="local-teamB" class="lsetup-input" placeholder="Team B" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z\s]/g, '')">
+
+          <!-- Team B Config Card -->
+          <div class="team-setup-card team-b-card">
+            <div class="lsetup-field">
+              <label class="lsetup-label">🔴 Team B Name</label>
+              <input type="text" id="local-teamB" class="lsetup-input" placeholder="TEAM B" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z\s]/g, '')">
+            </div>
+            <div class="team-customizer-row" style="display: flex; gap: 6px; margin-top: 6px;">
+              <div class="lsetup-field" style="flex: 1;">
+                <label class="lsetup-label">Jersey</label>
+                <div class="color-picker-wrapper">
+                  <input type="color" id="local-colorB" value="#ef4444" class="jersey-color-input">
+                </div>
+              </div>
+              <div class="lsetup-field" style="flex: 2;">
+                <label class="lsetup-label">Emblem</label>
+                <select id="local-logoB" class="lsetup-input lsetup-select">
+                  <option value="🐯" selected>🐯 Tigers</option>
+                  <option value="🦁">🦁 Lions</option>
+                  <option value="⚡">⚡ Chargers</option>
+                  <option value="🔥">🔥 Strikers</option>
+                  <option value="👑">👑 Kings</option>
+                  <option value="🦅">🦅 Eagles</option>
+                  <option value="🏏">🏏 Batsmen</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
 
+        <!-- Section 2: Match Rules -->
+        <div class="setup-section-title" style="margin-top: 6px;">🎯 Match Settings</div>
+        
         <!-- Row 2: Overs + Players -->
         <div class="lsetup-grid-2">
           <div class="lsetup-field">
@@ -177,18 +228,81 @@
       <button class="back-btn" data-navigate="home">← Back</button>
       <h2 class="setup-title">Tournament Match Setup</h2>
       <form id="tournament-setup-form" class="setup-form">
+        
+        <div class="setup-section-title">🏆 Tournament Info</div>
         <div class="form-group">
           <label for="tournament-name">Tournament Name</label>
           <input type="text" id="tournament-name" placeholder="Enter tournament name" required>
         </div>
-        <div class="form-group">
-          <label for="tournament-teamA">Team A Name</label>
-          <input type="text" id="tournament-teamA" placeholder="Enter Team A name" required oninput="this.value = this.value.toUpperCase().replace(/[^A-Z\s]/g, '')">
+
+        <div class="setup-section-title">👥 Team Config</div>
+        <div class="lsetup-grid-2" style="margin-bottom: 12px;">
+          <!-- Team A Tournament Card -->
+          <div class="team-setup-card team-a-card" style="background: rgba(255,255,255,0.02); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+            <div class="form-group">
+              <label for="tournament-teamA">Team A Name</label>
+              <input type="text" id="tournament-teamA" placeholder="Team A" required oninput="this.value = this.value.toUpperCase().replace(/[^A-Z\s]/g, '')">
+            </div>
+            <div class="form-group">
+              <label for="tournament-captainA">Captain Name</label>
+              <input type="text" id="tournament-captainA" placeholder="Captain A" required>
+            </div>
+            <div class="team-customizer-row" style="display: flex; gap: 6px; margin-top: 6px;">
+              <div class="lsetup-field" style="flex: 1; display:flex; flex-direction:column; gap:4px;">
+                <label class="lsetup-label">Jersey</label>
+                <div class="color-picker-wrapper">
+                  <input type="color" id="tournament-colorA" value="#3b82f6" class="jersey-color-input">
+                </div>
+              </div>
+              <div class="lsetup-field" style="flex: 2; display:flex; flex-direction:column; gap:4px;">
+                <label class="lsetup-label">Emblem</label>
+                <select id="tournament-logoA" class="lsetup-input lsetup-select" style="padding: 6px 11px;">
+                  <option value="🦁">🦁 Lions</option>
+                  <option value="⚡">⚡ Chargers</option>
+                  <option value="🔥">🔥 Strikers</option>
+                  <option value="👑">👑 Kings</option>
+                  <option value="🐯">🐯 Tigers</option>
+                  <option value="🦅">🦅 Eagles</option>
+                  <option value="🏏">🏏 Batsmen</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Team B Tournament Card -->
+          <div class="team-setup-card team-b-card" style="background: rgba(255,255,255,0.02); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+            <div class="form-group">
+              <label for="tournament-teamB">Team B Name</label>
+              <input type="text" id="tournament-teamB" placeholder="Team B" required oninput="this.value = this.value.toUpperCase().replace(/[^A-Z\s]/g, '')">
+            </div>
+            <div class="form-group">
+              <label for="tournament-captainB">Captain Name</label>
+              <input type="text" id="tournament-captainB" placeholder="Captain B" required>
+            </div>
+            <div class="team-customizer-row" style="display: flex; gap: 6px; margin-top: 6px;">
+              <div class="lsetup-field" style="flex: 1; display:flex; flex-direction:column; gap:4px;">
+                <label class="lsetup-label">Jersey</label>
+                <div class="color-picker-wrapper">
+                  <input type="color" id="tournament-colorB" value="#ef4444" class="jersey-color-input">
+                </div>
+              </div>
+              <div class="lsetup-field" style="flex: 2; display:flex; flex-direction:column; gap:4px;">
+                <label class="lsetup-label">Emblem</label>
+                <select id="tournament-logoB" class="lsetup-input lsetup-select" style="padding: 6px 11px;">
+                  <option value="🐯" selected>🐯 Tigers</option>
+                  <option value="🦁">🦁 Lions</option>
+                  <option value="⚡">⚡ Chargers</option>
+                  <option value="🔥">🔥 Strikers</option>
+                  <option value="👑">👑 Kings</option>
+                  <option value="🦅">🦅 Eagles</option>
+                  <option value="🏏">🏏 Batsmen</option>
+                </select>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="form-group">
-          <label for="tournament-teamB">Team B Name</label>
-          <input type="text" id="tournament-teamB" placeholder="Enter Team B name" required oninput="this.value = this.value.toUpperCase().replace(/[^A-Z\s]/g, '')">
-        </div>
+
+        <div class="setup-section-title">🎯 Match Settings</div>
         <div class="form-group" id="tournament-batting-group">
           <label for="tournament-bat-first">Team to Bat First</label>
           <select id="tournament-bat-first">
@@ -196,22 +310,18 @@
             <option value="1">Team B</option>
           </select>
         </div>
-        <div class="form-group">
-          <label for="tournament-captainA">Team A Captain</label>
-          <input type="text" id="tournament-captainA" placeholder="Captain name" required>
+        <div class="lsetup-grid-2">
+          <div class="form-group">
+            <label for="tournament-overs">Total Overs</label>
+            <input type="number" id="tournament-overs" placeholder="e.g. 20" min="1" max="50" required>
+          </div>
+          <div class="form-group">
+            <label for="tournament-players">Players per Team</label>
+            <input type="number" id="tournament-players" placeholder="e.g. 11" min="2" max="11" required>
+          </div>
         </div>
-        <div class="form-group">
-          <label for="tournament-captainB">Team B Captain</label>
-          <input type="text" id="tournament-captainB" placeholder="Captain name" required>
-        </div>
-        <div class="form-group">
-          <label for="tournament-overs">Total Overs</label>
-          <input type="number" id="tournament-overs" placeholder="e.g. 20" min="1" max="50" required>
-        </div>
-        <div class="form-group">
-          <label for="tournament-players">Players per Team</label>
-          <input type="number" id="tournament-players" placeholder="e.g. 11" min="2" max="11" required>
-        </div>
+        
+        <div class="setup-section-title" id="tournament-squad-section-title" style="display:none; margin-top: 10px;">👥 Squad Details</div>
         <div id="tournament-player-names-section" class="player-names-section"></div>
         <div class="form-group" style="margin-top: 15px;">
           <label for="tournament-host-password">🔐 Host Control Password (required)</label>
@@ -238,6 +348,12 @@
             <div class="crease left-crease"></div>
             <div class="crease right-crease"></div>
             <div class="stumps right-stumps"></div>
+            <!-- Wicketkeeper & Bowler Graphic -->
+            <div class="pitch-fielder fielder-keeper" id="local-keeper-avatar">🧤</div>
+            <div class="pitch-fielder fielder-bowler" id="local-bowler-avatar">🏃</div>
+            <!-- Ball element for delivery animation -->
+            <div class="pitch-ball" id="local-pitch-ball" style="display:none"></div>
+            
             <div class="runner runner-a" id="local-runner-a" data-dir="right">
               <div class="player-graphic">
                 <div class="p-arm p-arm-back"></div>
@@ -267,100 +383,146 @@
 
       <!-- Bottom Panel -->
       <div class="match-bottom-panel">
-      <!-- Auth Button (small corner) -->
-      <button class="auth-corner-btn" id="local-auth-banner" title="Authenticate">
-        <span class="auth-corner-icon">🔒</span>
-      </button>
+        <!-- Auth Button (small corner) -->
+        <button class="auth-corner-btn" id="local-auth-banner" title="Authenticate">
+          <span class="auth-corner-icon">🔒</span>
+        </button>
 
-      <!-- Scoreboard -->
-      <div class="scoreboard" id="local-scoreboard">
-        <div class="scoreboard-header">
-          <div class="team-badge batting" id="local-teamA-badge">
-            <span class="team-name" id="local-sb-teamA">Team A</span>
+        <!-- Panel Tabs navigation -->
+        <div class="panel-tabs">
+          <button class="panel-tab active" data-tab-target="local-tab-scoring">🏏 Live</button>
+          <button class="panel-tab" data-tab-target="local-tab-stats" id="btn-local-tab-stats">📈 Stats</button>
+          <button class="panel-tab" data-tab-target="local-tab-reactions">💬 Reactions</button>
+        </div>
+
+        <!-- TAB CONTENT: Scoring -->
+        <div class="tab-panelactive active" id="local-tab-scoring">
+          <!-- Scoreboard -->
+          <div class="scoreboard" id="local-scoreboard">
+            <div class="scoreboard-header">
+              <div class="team-badge batting" id="local-teamA-badge">
+                <span class="team-emblem" id="local-emblem-teamA"></span>
+                <span class="team-name" id="local-sb-teamA">Team A</span>
+              </div>
+              <div class="vs-divider">VS</div>
+              <div class="team-badge" id="local-teamB-badge">
+                <span class="team-emblem" id="local-emblem-teamB"></span>
+                <span class="team-name" id="local-sb-teamB">Team B</span>
+              </div>
+            </div>
+
+            <div class="score-display">
+              <div class="current-innings-label" id="local-innings-label">1st Innings</div>
+              <div class="score-main">
+                <span class="score-runs" id="local-runs">0</span>
+                <span class="score-separator">/</span>
+                <span class="score-wickets" id="local-wickets">0</span>
+              </div>
+              <div class="score-overs">
+                Overs: <span id="local-overs-display">0.0</span> / <span id="local-total-overs">0</span>
+              </div>
+            </div>
+
+            <div class="wicket-indicator" id="local-wicket-indicator"></div>
+
+            <div class="stats-grid">
+              <div class="stat-item">
+                <span class="stat-label">Players Left</span>
+                <span class="stat-value" id="local-players-remaining">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Run Rate</span>
+                <span class="stat-value" id="local-run-rate">0.00</span>
+              </div>
+              <div class="stat-item" id="local-target-section" style="display:none">
+                <span class="stat-label">Target</span>
+                <span class="stat-value" id="local-target">0</span>
+              </div>
+              <div class="stat-item" id="local-required-section" style="display:none">
+                <span class="stat-label">Need</span>
+                <span class="stat-value" id="local-required">0 off 0</span>
+              </div>
+              <div class="stat-item" id="local-reqrate-section" style="display:none">
+                <span class="stat-label">Req. Rate</span>
+                <span class="stat-value" id="local-req-rate">0.00</span>
+              </div>
+              <div class="stat-item stat-item-extras">
+                <span class="stat-label">Extras</span>
+                <span class="stat-value" id="local-extras">0</span>
+              </div>
+            </div>
+
+            <div class="last-over-section">
+              <span class="last-over-label">This Over:</span>
+              <div class="last-over-balls" id="local-current-over"></div>
+            </div>
           </div>
-          <div class="vs-divider">VS</div>
-          <div class="team-badge" id="local-teamB-badge">
-            <span class="team-name" id="local-sb-teamB">Team B</span>
+
+          <!-- Run Controls -->
+          <div class="controls" id="local-controls">
+            <div class="run-buttons">
+              <button class="run-btn" data-action="dot">0</button>
+              <button class="run-btn" data-action="1">1</button>
+              <button class="run-btn" data-action="2">2</button>
+              <button class="run-btn" data-action="3">3</button>
+              <button class="run-btn four" data-action="4">4</button>
+              <button class="run-btn" data-action="5">5</button>
+              <button class="run-btn six" data-action="6">6</button>
+            </div>
+            <div class="extra-buttons">
+              <button class="extra-btn wide" data-action="wide">Wide</button>
+              <button class="extra-btn noball" data-action="noball">No Ball</button>
+              <button class="extra-btn out" data-action="out">OUT</button>
+              <button class="extra-btn undo" data-action="undo">↩ Undo</button>
+            </div>
+            <div class="extra-run-row">
+              <button class="extra-run-btn" data-action="extrarun" id="local-extra-run-btn">+1 Extra</button>
+            </div>
           </div>
         </div>
 
-        <div class="score-display">
-          <div class="current-innings-label" id="local-innings-label">1st Innings</div>
-          <div class="score-main">
-            <span class="score-runs" id="local-runs">0</span>
-            <span class="score-separator">/</span>
-            <span class="score-wickets" id="local-wickets">0</span>
-          </div>
-          <div class="score-overs">
-            Overs: <span id="local-overs-display">0.0</span> / <span id="local-total-overs">0</span>
-          </div>
-        </div>
-
-        <div class="wicket-indicator" id="local-wicket-indicator"></div>
-
-        <div class="stats-grid">
-          <div class="stat-item">
-            <span class="stat-label">Players Left</span>
-            <span class="stat-value" id="local-players-remaining">0</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Run Rate</span>
-            <span class="stat-value" id="local-run-rate">0.00</span>
-          </div>
-          <div class="stat-item" id="local-target-section" style="display:none">
-            <span class="stat-label">Target</span>
-            <span class="stat-value" id="local-target">0</span>
-          </div>
-          <div class="stat-item" id="local-required-section" style="display:none">
-            <span class="stat-label">Need</span>
-            <span class="stat-value" id="local-required">0 off 0</span>
-          </div>
-          <div class="stat-item" id="local-reqrate-section" style="display:none">
-            <span class="stat-label">Req. Rate</span>
-            <span class="stat-value" id="local-req-rate">0.00</span>
-          </div>
-          <div class="stat-item stat-item-extras">
-            <span class="stat-label">Extras</span>
-            <span class="stat-value" id="local-extras">0</span>
+        <!-- TAB CONTENT: Stats -->
+        <div class="tab-panelactive" id="local-tab-stats" style="display:none;">
+          <div class="charts-container">
+            <div class="chart-card">
+              <div class="chart-title">📈 Innings Progress (Worm Graph)</div>
+              <div class="chart-canvas-wrapper">
+                <canvas id="local-worm-canvas"></canvas>
+              </div>
+            </div>
+            <div class="chart-card" style="margin-top: 15px;">
+              <div class="chart-title">📊 Runs Scored Per Over (Manhattan Chart)</div>
+              <div class="chart-canvas-wrapper">
+                <canvas id="local-manhattan-canvas"></canvas>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="last-over-section">
-          <span class="last-over-label">This Over:</span>
-          <div class="last-over-balls" id="local-current-over"></div>
+        <!-- TAB CONTENT: Reactions -->
+        <div class="tab-panelactive" id="local-tab-reactions" style="display:none;">
+          <div class="cheering-reactions-wrapper">
+            <div class="cheer-title">Send Cheer Reaction to All Viewers</div>
+            <div class="cheer-buttons-grid">
+              <button class="cheer-btn-trigger" data-emoji="👏"><span class="cheer-icon">👏</span><span class="cheer-name">Clap</span></button>
+              <button class="cheer-btn-trigger" data-emoji="🔥"><span class="cheer-icon">🔥</span><span class="cheer-name">Fire</span></button>
+              <button class="cheer-btn-trigger" data-emoji="❤️"><span class="cheer-icon">❤️</span><span class="cheer-name">Love</span></button>
+              <button class="cheer-btn-trigger" data-emoji="👍"><span class="cheer-icon">👍</span><span class="cheer-name">Like</span></button>
+              <button class="cheer-btn-trigger" data-emoji="😲"><span class="cheer-icon">😲</span><span class="cheer-name">Shock</span></button>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <!-- Run Controls -->
-      <div class="controls" id="local-controls">
-        <div class="run-buttons">
-          <button class="run-btn" data-action="dot">0</button>
-          <button class="run-btn" data-action="1">1</button>
-          <button class="run-btn" data-action="2">2</button>
-          <button class="run-btn" data-action="3">3</button>
-          <button class="run-btn four" data-action="4">4</button>
-          <button class="run-btn" data-action="5">5</button>
-          <button class="run-btn six" data-action="6">6</button>
+        <!-- Bottom Actions -->
+        <div class="match-actions">
+          <button class="action-btn share-btn" id="btn-local-share">🔗 Share Match</button>
+          <button class="action-btn delete-btn" id="btn-local-delete">🗑️ Delete Match</button>
+          <button class="action-btn" id="btn-local-home">🏠 Home</button>
         </div>
-        <div class="extra-buttons">
-          <button class="extra-btn wide" data-action="wide">Wide</button>
-          <button class="extra-btn noball" data-action="noball">No Ball</button>
-          <button class="extra-btn out" data-action="out">OUT</button>
-          <button class="extra-btn undo" data-action="undo">↩ Undo</button>
-        </div>
-        <div class="extra-run-row">
-          <button class="extra-run-btn" data-action="extrarun" id="local-extra-run-btn">+1 Extra</button>
-        </div>
-      </div>
-
-      <!-- Bottom Actions -->
-      <div class="match-actions">
-        <button class="action-btn share-btn" id="btn-local-share">🔗 Share Match</button>
-        <button class="action-btn delete-btn" id="btn-local-delete">🗑️ Delete Match</button>
-        <button class="action-btn" id="btn-local-home">🏠 Home</button>
-      </div>
-      <div class="creator-credit">Made ❤️ by <strong>SANUWAR HUSSAIN</strong><a href="https://www.instagram.com/iam.sanuwar?igsh=Z2kyODk1YmppY3pj&utm_source=qr" target="_blank" class="insta-follow-btn"><svg class="insta-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>Follow on Instagram</a></div>
+        <div class="creator-credit">Made ❤️ by <strong>SANUWAR HUSSAIN</strong><a href="https://www.instagram.com/iam.sanuwar?igsh=Z2kyODk1YmppY3pj&utm_source=qr" target="_blank" class="insta-follow-btn"><svg class="insta-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>Follow on Instagram</a></div>
       </div> <!-- End Bottom Panel -->
+    </div>
+  </section>
     </div>
   </section>
 
@@ -375,6 +537,12 @@
             <div class="crease left-crease"></div>
             <div class="crease right-crease"></div>
             <div class="stumps right-stumps"></div>
+            <!-- Wicketkeeper & Bowler Graphic -->
+            <div class="pitch-fielder fielder-keeper" id="tournament-keeper-avatar">🧤</div>
+            <div class="pitch-fielder fielder-bowler" id="tournament-bowler-avatar">🏃</div>
+            <!-- Ball element for delivery animation -->
+            <div class="pitch-ball" id="tournament-pitch-ball" style="display:none"></div>
+
             <div class="runner runner-a" id="tournament-runner-a" data-dir="right">
               <div class="player-graphic">
                 <div class="p-arm p-arm-back"></div>
@@ -404,110 +572,158 @@
 
       <!-- Bottom Panel -->
       <div class="match-bottom-panel">
-      <!-- Auth Button (small corner) -->
-      <button class="auth-corner-btn" id="tournament-auth-banner" title="Authenticate">
-        <span class="auth-corner-icon">🔒</span>
-      </button>
+        <!-- Auth Button (small corner) -->
+        <button class="auth-corner-btn" id="tournament-auth-banner" title="Authenticate">
+          <span class="auth-corner-icon">🔒</span>
+        </button>
 
-      <!-- Tournament Header -->
-      <div class="tournament-header" id="tournament-header-info">
-        <div class="tournament-title" id="tournament-display-name">Tournament</div>
-      </div>
+        <!-- Tournament Header -->
+        <div class="tournament-header" id="tournament-header-info">
+          <div class="tournament-title" id="tournament-display-name">Tournament</div>
+        </div>
 
-      <!-- Scoreboard -->
-      <div class="scoreboard tournament-scoreboard" id="tournament-scoreboard">
-        <div class="scoreboard-header">
-          <div class="team-badge batting" id="tournament-teamA-badge">
-            <span class="team-name" id="tournament-sb-teamA">Team A</span>
-            <span class="captain-name" id="tournament-sb-captainA">Captain</span>
+        <!-- Panel Tabs navigation -->
+        <div class="panel-tabs">
+          <button class="panel-tab active" data-tab-target="tournament-tab-scoring">🏏 Live</button>
+          <button class="panel-tab" data-tab-target="tournament-tab-stats" id="btn-tournament-tab-stats">📈 Stats</button>
+          <button class="panel-tab" data-tab-target="tournament-tab-squads">👥 Squads</button>
+          <button class="panel-tab" data-tab-target="tournament-tab-reactions">💬 Reactions</button>
+        </div>
+
+        <!-- TAB CONTENT: Scoring -->
+        <div class="tab-panelactive active" id="tournament-tab-scoring">
+          <!-- Scoreboard -->
+          <div class="scoreboard tournament-scoreboard" id="tournament-scoreboard">
+            <div class="scoreboard-header">
+              <div class="team-badge batting" id="tournament-teamA-badge">
+                <span class="team-emblem" id="tournament-emblem-teamA"></span>
+                <span class="team-name" id="tournament-sb-teamA">Team A</span>
+                <span class="captain-name" id="tournament-sb-captainA">Captain</span>
+              </div>
+              <div class="vs-divider">VS</div>
+              <div class="team-badge" id="tournament-teamB-badge">
+                <span class="team-emblem" id="tournament-emblem-teamB"></span>
+                <span class="team-name" id="tournament-sb-teamB">Team B</span>
+                <span class="captain-name" id="tournament-sb-captainB">Captain</span>
+              </div>
+            </div>
+
+            <div class="score-display">
+              <div class="current-innings-label" id="tournament-innings-label">1st Innings</div>
+              <div class="score-main">
+                <span class="score-runs" id="tournament-runs">0</span>
+                <span class="score-separator">/</span>
+                <span class="score-wickets" id="tournament-wickets">0</span>
+              </div>
+              <div class="score-overs">
+                Overs: <span id="tournament-overs-display">0.0</span> / <span id="tournament-total-overs">0</span>
+              </div>
+            </div>
+
+            <div class="wicket-indicator" id="tournament-wicket-indicator"></div>
+
+            <div class="stats-grid">
+              <div class="stat-item">
+                <span class="stat-label">Players Left</span>
+                <span class="stat-value" id="tournament-players-remaining">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Run Rate</span>
+                <span class="stat-value" id="tournament-run-rate">0.00</span>
+              </div>
+              <div class="stat-item" id="tournament-target-section" style="display:none">
+                <span class="stat-label">Target</span>
+                <span class="stat-value" id="tournament-target">0</span>
+              </div>
+              <div class="stat-item" id="tournament-required-section" style="display:none">
+                <span class="stat-label">Need</span>
+                <span class="stat-value" id="tournament-required">0 off 0</span>
+              </div>
+              <div class="stat-item" id="tournament-reqrate-section" style="display:none">
+                <span class="stat-label">Req. Rate</span>
+                <span class="stat-value" id="tournament-req-rate">0.00</span>
+              </div>
+              <div class="stat-item stat-item-extras">
+                <span class="stat-label">Extras</span>
+                <span class="stat-value" id="tournament-extras">0</span>
+              </div>
+            </div>
+
+            <div class="last-over-section">
+              <span class="last-over-label">This Over:</span>
+              <div class="last-over-balls" id="tournament-current-over"></div>
+            </div>
           </div>
-          <div class="vs-divider">VS</div>
-          <div class="team-badge" id="tournament-teamB-badge">
-            <span class="team-name" id="tournament-sb-teamB">Team B</span>
-            <span class="captain-name" id="tournament-sb-captainB">Captain</span>
+
+          <!-- Run Controls -->
+          <div class="controls" id="tournament-controls">
+            <div class="run-buttons">
+              <button class="run-btn" data-action="dot">0</button>
+              <button class="run-btn" data-action="1">1</button>
+              <button class="run-btn" data-action="2">2</button>
+              <button class="run-btn" data-action="3">3</button>
+              <button class="run-btn four" data-action="4">4</button>
+              <button class="run-btn" data-action="5">5</button>
+              <button class="run-btn six" data-action="6">6</button>
+            </div>
+            <div class="extra-buttons">
+              <button class="extra-btn wide" data-action="wide">Wide</button>
+              <button class="extra-btn noball" data-action="noball">No Ball</button>
+              <button class="extra-btn out" data-action="out">OUT</button>
+              <button class="extra-btn undo" data-action="undo">↩ Undo</button>
+            </div>
+            <div class="extra-run-row">
+              <button class="extra-run-btn" data-action="extrarun" id="tournament-extra-run-btn">+1 Extra</button>
+            </div>
           </div>
         </div>
 
-        <div class="score-display">
-          <div class="current-innings-label" id="tournament-innings-label">1st Innings</div>
-          <div class="score-main">
-            <span class="score-runs" id="tournament-runs">0</span>
-            <span class="score-separator">/</span>
-            <span class="score-wickets" id="tournament-wickets">0</span>
-          </div>
-          <div class="score-overs">
-            Overs: <span id="tournament-overs-display">0.0</span> / <span id="tournament-total-overs">0</span>
-          </div>
-        </div>
-
-        <div class="wicket-indicator" id="tournament-wicket-indicator"></div>
-
-        <div class="stats-grid">
-          <div class="stat-item">
-            <span class="stat-label">Players Left</span>
-            <span class="stat-value" id="tournament-players-remaining">0</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Run Rate</span>
-            <span class="stat-value" id="tournament-run-rate">0.00</span>
-          </div>
-          <div class="stat-item" id="tournament-target-section" style="display:none">
-            <span class="stat-label">Target</span>
-            <span class="stat-value" id="tournament-target">0</span>
-          </div>
-          <div class="stat-item" id="tournament-required-section" style="display:none">
-            <span class="stat-label">Need</span>
-            <span class="stat-value" id="tournament-required">0 off 0</span>
-          </div>
-          <div class="stat-item" id="tournament-reqrate-section" style="display:none">
-            <span class="stat-label">Req. Rate</span>
-            <span class="stat-value" id="tournament-req-rate">0.00</span>
-          </div>
-          <div class="stat-item stat-item-extras">
-            <span class="stat-label">Extras</span>
-            <span class="stat-value" id="tournament-extras">0</span>
+        <!-- TAB CONTENT: Stats -->
+        <div class="tab-panelactive" id="tournament-tab-stats" style="display:none;">
+          <div class="charts-container">
+            <div class="chart-card">
+              <div class="chart-title">📈 Innings Progress (Worm Graph)</div>
+              <div class="chart-canvas-wrapper">
+                <canvas id="tournament-worm-canvas"></canvas>
+              </div>
+            </div>
+            <div class="chart-card" style="margin-top: 15px;">
+              <div class="chart-title">📊 Runs Scored Per Over (Manhattan Chart)</div>
+              <div class="chart-canvas-wrapper">
+                <canvas id="tournament-manhattan-canvas"></canvas>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="last-over-section">
-          <span class="last-over-label">This Over:</span>
-          <div class="last-over-balls" id="tournament-current-over"></div>
+        <!-- TAB CONTENT: Squads -->
+        <div class="tab-panelactive" id="tournament-tab-squads" style="display:none;">
+          <!-- Player List -->
+          <div class="player-list-section" id="tournament-player-list" style="margin-top:0;">
+          </div>
         </div>
 
-        <!-- Player List -->
-        <div class="player-list-section" id="tournament-player-list">
+        <!-- TAB CONTENT: Reactions -->
+        <div class="tab-panelactive" id="tournament-tab-reactions" style="display:none;">
+          <div class="cheering-reactions-wrapper">
+            <div class="cheer-title">Send Cheer Reaction to All Viewers</div>
+            <div class="cheer-buttons-grid">
+              <button class="cheer-btn-trigger" data-emoji="👏"><span class="cheer-icon">👏</span><span class="cheer-name">Clap</span></button>
+              <button class="cheer-btn-trigger" data-emoji="🔥"><span class="cheer-icon">🔥</span><span class="cheer-name">Fire</span></button>
+              <button class="cheer-btn-trigger" data-emoji="❤️"><span class="cheer-icon">❤️</span><span class="cheer-name">Love</span></button>
+              <button class="cheer-btn-trigger" data-emoji="👍"><span class="cheer-icon">👍</span><span class="cheer-name">Like</span></button>
+              <button class="cheer-btn-trigger" data-emoji="😲"><span class="cheer-icon">😲</span><span class="cheer-name">Shock</span></button>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <!-- Run Controls -->
-      <div class="controls" id="tournament-controls">
-        <div class="run-buttons">
-          <button class="run-btn" data-action="dot">0</button>
-          <button class="run-btn" data-action="1">1</button>
-          <button class="run-btn" data-action="2">2</button>
-          <button class="run-btn" data-action="3">3</button>
-          <button class="run-btn four" data-action="4">4</button>
-          <button class="run-btn" data-action="5">5</button>
-          <button class="run-btn six" data-action="6">6</button>
+        <!-- Bottom Actions -->
+        <div class="match-actions">
+          <button class="action-btn share-btn" id="btn-tournament-share">🔗 Share Match</button>
+          <button class="action-btn delete-btn" id="btn-tournament-delete">🗑️ Delete Match</button>
+          <button class="action-btn" id="btn-tournament-home">🏠 Home</button>
         </div>
-        <div class="extra-buttons">
-          <button class="extra-btn wide" data-action="wide">Wide</button>
-          <button class="extra-btn noball" data-action="noball">No Ball</button>
-          <button class="extra-btn out" data-action="out">OUT</button>
-          <button class="extra-btn undo" data-action="undo">↩ Undo</button>
-        </div>
-        <div class="extra-run-row">
-          <button class="extra-run-btn" data-action="extrarun" id="tournament-extra-run-btn">+1 Extra</button>
-        </div>
-      </div>
-
-      <!-- Bottom Actions -->
-      <div class="match-actions">
-        <button class="action-btn share-btn" id="btn-tournament-share">🔗 Share Match</button>
-        <button class="action-btn delete-btn" id="btn-tournament-delete">🗑️ Delete Match</button>
-        <button class="action-btn" id="btn-tournament-home">🏠 Home</button>
-      </div>
-      <div class="creator-credit">Made ❤️ by <strong>SANUWAR HUSSAIN</strong><a href="https://www.instagram.com/iam.sanuwar?igsh=Z2kyODk1YmppY3pj&utm_source=qr" target="_blank" class="insta-follow-btn"><svg class="insta-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>Follow on Instagram</a></div>
+        <div class="creator-credit">Made ❤️ by <strong>SANUWAR HUSSAIN</strong><a href="https://www.instagram.com/iam.sanuwar?igsh=Z2kyODk1YmppY3pj&utm_source=qr" target="_blank" class="insta-follow-btn"><svg class="insta-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>Follow on Instagram</a></div>
       </div> <!-- End Bottom Panel -->
     </div>
   </section>
@@ -644,6 +860,9 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- App Scripts -->
   <script src="js/firebase.js?v=14"></script>

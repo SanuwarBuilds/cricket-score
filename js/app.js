@@ -623,6 +623,10 @@ const App = (() => {
       btn.addEventListener('click', (e) => {
         addRipple(e, btn);
         const target = btn.getAttribute('data-navigate');
+        if (target === 'tournament-setup') {
+          showToast('🏆 This is still in developing stage');
+          return;
+        }
         navigate(target);
       });
     });
@@ -739,6 +743,46 @@ const App = (() => {
     });
     document.getElementById('delete-code-input').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') document.getElementById('delete-confirm').click();
+    });
+
+    // ---- Panel Tabs Click Handlers ----
+    document.querySelectorAll('.panel-tab').forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        const targetId = tab.getAttribute('data-tab-target');
+        const container = tab.closest('.match-bottom-panel');
+        
+        // Deactivate all sibling tabs
+        container.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        // Hide all sibling panel content divs
+        container.querySelectorAll('.tab-panelactive').forEach(panel => {
+          panel.style.display = 'none';
+          panel.classList.remove('active');
+        });
+        
+        // Show target panel content
+        const targetPanel = document.getElementById(targetId);
+        if (targetPanel) {
+          targetPanel.style.display = 'flex';
+          targetPanel.classList.add('active');
+          
+          // If stats tab is opened, force a chart redraw
+          const activeMatchState = LocalMode.getState() || TournamentMode.getState();
+          if (targetId.includes('tab-stats') && activeMatchState) {
+            updateCharts(activeMatchState, targetId.startsWith('local') ? 'local' : 'tournament', true);
+          }
+        }
+      });
+    });
+
+    // ---- Cheer Emojis Send Handlers ----
+    document.addEventListener('click', (e) => {
+      const cheerBtn = e.target.closest('.cheer-btn-trigger');
+      if (cheerBtn) {
+        const emoji = cheerBtn.getAttribute('data-emoji');
+        sendReaction(emoji);
+      }
     });
 
     // Start on home
@@ -875,5 +919,282 @@ const App = (() => {
   // Init on DOM ready
   document.addEventListener('DOMContentLoaded', init);
 
-  return { navigate, showCinematicIntro, showToast };
+  // ==========================================================
+  // REAL-TIME CHARTS & REACTIONS IMPLEMENTATIONS
+  // ==========================================================
+
+  let wormChartInstance = null;
+  let manhattanChartInstance = null;
+  let lastChartMatchId = null;
+  let currentReactionsRef = null;
+
+  function updateCharts(state, mode, forceRedraw = false) {
+    if (!state || !state.teams) return;
+    
+    // Only draw if the stats tab is currently active
+    const statsTabBtn = document.getElementById(`btn-${mode}-tab-stats`);
+    if (!statsTabBtn || (!statsTabBtn.classList.contains('active') && !forceRedraw)) {
+      return; 
+    }
+
+    const canvasWorm = document.getElementById(`${mode}-worm-canvas`);
+    const canvasManhattan = document.getElementById(`${mode}-manhattan-canvas`);
+    if (!canvasWorm || !canvasManhattan) return;
+
+    // If match ID changed, clean up previous chart instances
+    if (lastChartMatchId !== state.id) {
+      destroyCharts();
+      lastChartMatchId = state.id;
+    }
+
+    const teamA = state.teams[0];
+    const teamB = state.teams[1];
+    const totalOvers = state.totalOvers || 5;
+
+    const statsA = parseHistoryForCharts(teamA, totalOvers);
+    const statsB = parseHistoryForCharts(teamB, totalOvers);
+
+    const labels = Array.from({ length: totalOvers + 1 }, (_, i) => i);
+
+    const wormDataA = [0].concat(statsA.map(s => s.cumulativeRuns));
+    const wormDataB = state.currentInnings >= 1 || state.isMatchOver || teamB.ballHistory.length > 0 ? [0].concat(statsB.map(s => s.cumulativeRuns)) : [];
+
+    const manhattanDataA = statsA.map(s => s.runsInOver);
+    const manhattanDataB = statsB.map(s => s.runsInOver);
+    const manhattanLabels = Array.from({ length: totalOvers }, (_, i) => `Ov ${i + 1}`);
+
+    // Update or create Worm line chart
+    if (wormChartInstance && !forceRedraw) {
+      wormChartInstance.data.datasets[0].label = teamA.name;
+      wormChartInstance.data.datasets[0].data = wormDataA;
+      wormChartInstance.data.datasets[0].borderColor = teamA.color || '#3b82f6';
+      wormChartInstance.data.datasets[0].pointBackgroundColor = teamA.color || '#3b82f6';
+      
+      if (wormChartInstance.data.datasets[1]) {
+        wormChartInstance.data.datasets[1].label = teamB.name;
+        wormChartInstance.data.datasets[1].data = wormDataB;
+        wormChartInstance.data.datasets[1].borderColor = teamB.color || '#ef4444';
+        wormChartInstance.data.datasets[1].pointBackgroundColor = teamB.color || '#ef4444';
+      } else if (wormDataB.length > 0) {
+        wormChartInstance.data.datasets.push({
+          label: teamB.name,
+          data: wormDataB,
+          borderColor: teamB.color || '#ef4444',
+          backgroundColor: 'rgba(239, 68, 68, 0.05)',
+          borderWidth: 3,
+          tension: 0.3,
+          pointRadius: 4,
+          pointBackgroundColor: teamB.color || '#ef4444'
+        });
+      }
+      wormChartInstance.update('none');
+    } else {
+      if (wormChartInstance) wormChartInstance.destroy();
+      
+      const datasets = [
+        {
+          label: teamA.name,
+          data: wormDataA,
+          borderColor: teamA.color || '#3b82f6',
+          backgroundColor: 'rgba(0, 229, 255, 0.05)',
+          borderWidth: 3,
+          tension: 0.3,
+          pointRadius: 4,
+          pointBackgroundColor: teamA.color || '#3b82f6'
+        }
+      ];
+
+      if (wormDataB.length > 0) {
+        datasets.push({
+          label: teamB.name,
+          data: wormDataB,
+          borderColor: teamB.color || '#ef4444',
+          backgroundColor: 'rgba(239, 68, 68, 0.05)',
+          borderWidth: 3,
+          tension: 0.3,
+          pointRadius: 4,
+          pointBackgroundColor: teamB.color || '#ef4444'
+        });
+      }
+
+      wormChartInstance = new Chart(canvasWorm.getContext('2d'), {
+        type: 'line',
+        data: { labels, datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#fff', font: { family: 'Outfit', size: 10 } } }
+          },
+          scales: {
+            x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#889' } },
+            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#889' }, min: 0 }
+          }
+        }
+      });
+    }
+
+    // Update or create Manhattan bar chart
+    if (manhattanChartInstance && !forceRedraw) {
+      manhattanChartInstance.data.datasets[0].label = teamA.name;
+      manhattanChartInstance.data.datasets[0].data = manhattanDataA;
+      manhattanChartInstance.data.datasets[0].backgroundColor = teamA.color || '#3b82f6';
+      
+      if (manhattanChartInstance.data.datasets[1]) {
+        manhattanChartInstance.data.datasets[1].label = teamB.name;
+        manhattanChartInstance.data.datasets[1].data = manhattanDataB;
+        manhattanChartInstance.data.datasets[1].backgroundColor = teamB.color || '#ef4444';
+      } else if (manhattanDataB.length > 0) {
+        manhattanChartInstance.data.datasets.push({
+          label: teamB.name,
+          data: manhattanDataB,
+          backgroundColor: teamB.color || '#ef4444',
+          borderRadius: 4
+        });
+      }
+      manhattanChartInstance.update('none');
+    } else {
+      if (manhattanChartInstance) manhattanChartInstance.destroy();
+      
+      const datasets = [
+        {
+          label: teamA.name,
+          data: manhattanDataA,
+          backgroundColor: teamA.color || '#3b82f6',
+          borderRadius: 4
+        }
+      ];
+
+      if (state.currentInnings >= 1 || state.isMatchOver || teamB.ballHistory.length > 0) {
+        datasets.push({
+          label: teamB.name,
+          data: manhattanDataB,
+          backgroundColor: teamB.color || '#ef4444',
+          borderRadius: 4
+        });
+      }
+
+      manhattanChartInstance = new Chart(canvasManhattan.getContext('2d'), {
+        type: 'bar',
+        data: { labels: manhattanLabels, datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#fff', font: { family: 'Outfit', size: 10 } } }
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: '#889' } },
+            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#889' }, min: 0 }
+          }
+        }
+      });
+    }
+  }
+
+  function destroyCharts() {
+    if (wormChartInstance) { wormChartInstance.destroy(); wormChartInstance = null; }
+    if (manhattanChartInstance) { manhattanChartInstance.destroy(); manhattanChartInstance = null; }
+    lastChartMatchId = null;
+  }
+
+  function parseHistoryForCharts(team, totalOvers) {
+    const history = team.ballHistory || [];
+    const stats = [];
+    let currentRuns = 0;
+    let currentWickets = 0;
+    let legalBalls = 0;
+    let runsInOver = 0;
+    let overNumber = 1;
+
+    for (let i = 0; i < history.length; i++) {
+      const ball = history[i];
+      const val = ball.value || 0;
+      currentRuns += val;
+      runsInOver += val;
+
+      if (ball.type === 'out') currentWickets += 1;
+      if (ball.type !== 'wide' && ball.type !== 'noball') legalBalls += 1;
+
+      if (legalBalls === 6) {
+        stats.push({ overNumber, runsInOver, cumulativeRuns: currentRuns, wickets: currentWickets });
+        runsInOver = 0;
+        legalBalls = 0;
+        overNumber += 1;
+      }
+    }
+
+    if (legalBalls > 0 && stats.length < totalOvers) {
+      stats.push({ overNumber, runsInOver, cumulativeRuns: currentRuns, wickets: currentWickets });
+    }
+    
+    return stats;
+  }
+
+  function initReactions(matchId) {
+    if (!matchId) return;
+    
+    if (currentReactionsRef) {
+      currentReactionsRef.off('child_added');
+      currentReactionsRef = null;
+    }
+    
+    const DB = FirebaseSync.getDb();
+    if (!DB) return;
+    
+    currentReactionsRef = DB.ref('matches/current/' + matchId + '/reactions');
+    
+    // Listen for new child added
+    currentReactionsRef.on('child_added', (snapshot) => {
+      const reaction = snapshot.val();
+      // Only show reactions added in last 8 seconds to prevent old ghost reactions on page load
+      if (reaction && reaction.type && (Date.now() - reaction.timestamp < 8000)) {
+        spawnFloatingEmoji(reaction.type);
+      }
+    });
+  }
+
+  function sendReaction(emoji) {
+    const matchState = LocalMode.getState() || TournamentMode.getState();
+    if (!matchState || !matchState.id) return;
+    
+    const DB = FirebaseSync.getDb();
+    if (!DB) return;
+    
+    const ref = DB.ref('matches/current/' + matchState.id + '/reactions').push();
+    ref.set({
+      type: emoji,
+      timestamp: firebase.database.ServerValue.TIMESTAMP
+    });
+    
+    setTimeout(() => {
+      ref.remove();
+    }, 4000);
+  }
+
+  function spawnFloatingEmoji(emoji) {
+    const activeScreen = document.querySelector('.screen.active');
+    if (!activeScreen) return;
+    const container = activeScreen.querySelector('.pitch-container');
+    if (!container) return;
+    
+    const emojiEl = document.createElement('div');
+    emojiEl.className = 'floating-emoji';
+    emojiEl.textContent = emoji;
+    
+    // Spawn between 15% and 85% width
+    const startX = 15 + Math.random() * 70;
+    emojiEl.style.left = startX + '%';
+    
+    const duration = 2.8 + Math.random() * 1.2;
+    emojiEl.style.animationDuration = duration + 's';
+    
+    container.appendChild(emojiEl);
+    
+    setTimeout(() => {
+      emojiEl.remove();
+    }, duration * 1000);
+  }
+
+  return { navigate, showCinematicIntro, showToast, updateCharts, initReactions, destroyCharts };
 })();

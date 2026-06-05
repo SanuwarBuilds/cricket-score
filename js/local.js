@@ -75,6 +75,10 @@ const LocalMode = (() => {
   async function startMatch() {
     const teamA = el('local-teamA').value.trim() || 'Team A';
     const teamB = el('local-teamB').value.trim() || 'Team B';
+    const colorA = el('local-colorA').value;
+    const logoA = el('local-logoA').value;
+    const colorB = el('local-colorB').value;
+    const logoB = el('local-logoB').value;
     const overs = parseInt(el('local-overs').value) || 5;
     const players = parseInt(el('local-players').value) || 8;
     const batFirst = parseInt(el('local-bat-first').value) || 0;
@@ -87,6 +91,8 @@ const LocalMode = (() => {
     matchState = CricketEngine.createMatch({
       mode: 'local',
       teamA, teamB,
+      colorA, logoA,
+      colorB, logoB,
       totalOvers: overs,
       playersPerTeam: players,
       batFirst: batFirst,
@@ -153,6 +159,9 @@ const LocalMode = (() => {
 
     // Start listening for real-time updates from Firebase
     FirebaseSync.listenMatch(matchState.id, matchListener);
+    
+    // Initialize reactions for this match
+    App.initReactions(matchState.id);
   }
 
   /**
@@ -210,7 +219,9 @@ const LocalMode = (() => {
       }
     };
     FirebaseSync.listenMatch(matchState.id, matchListener);
-
+    
+    // Initialize reactions for this match
+    App.initReactions(matchState.id);
     App.navigate('local-match');
   }
 
@@ -258,6 +269,7 @@ const LocalMode = (() => {
     switch (action) {
       case 'dot':
         CricketEngine.addRuns(matchState, 0);
+        Animations.playPitchAnimation(0, 'local');
         break;
       case '1':
         CricketEngine.addRuns(matchState, 1);
@@ -316,6 +328,7 @@ const LocalMode = (() => {
           _clearPendingUI();
         }
         CricketEngine.addWicket(matchState);
+        Animations.playPitchAnimation('out', 'local');
         animType = 'out';
         break;
       case 'extrarun':
@@ -405,17 +418,48 @@ const LocalMode = (() => {
     if (!matchState) return;
 
     const team = CricketEngine.getBattingTeam(matchState);
+    const bowlingTeam = CricketEngine.getBowlingTeam(matchState);
     const innings = matchState.currentInnings;
 
     // Team badges
     el('local-sb-teamA').textContent = matchState.teams[0].name;
     el('local-sb-teamB').textContent = matchState.teams[1].name;
+    
+    const emblemA = el('local-emblem-teamA');
+    const emblemB = el('local-emblem-teamB');
+    if (emblemA) emblemA.textContent = matchState.teams[0].emblem || '🦁';
+    if (emblemB) emblemB.textContent = matchState.teams[1].emblem || '🐯';
 
-    // Batting indicator
+    // Batting indicator & custom colors
     const badgeA = el('local-teamA-badge');
     const badgeB = el('local-teamB-badge');
+    if (badgeA) {
+      badgeA.style.borderColor = matchState.teams[0].color || '#3b82f6';
+      badgeA.style.setProperty('--batting-glow', matchState.teams[0].color || '#3b82f6');
+    }
+    if (badgeB) {
+      badgeB.style.borderColor = matchState.teams[1].color || '#ef4444';
+      badgeB.style.setProperty('--batting-glow', matchState.teams[1].color || '#ef4444');
+    }
     badgeA.classList.toggle('batting', innings === 0);
     badgeB.classList.toggle('batting', innings === 1);
+
+    // Apply colors to runners (both batsmen are from the batting team)
+    const runnerA = el('local-runner-a');
+    const runnerB = el('local-runner-b');
+    [runnerA, runnerB].forEach(runner => {
+      if (runner) {
+        runner.querySelectorAll('.p-head, .p-cap, .p-torso, .p-arm').forEach(part => {
+          part.style.backgroundColor = team.color || '#3b82f6';
+        });
+      }
+    });
+
+    // Style Bowler and Keeper with bowling team's color
+    const keeper = el('local-keeper-avatar');
+    const bowler = el('local-bowler-avatar');
+    if (keeper) keeper.style.filter = `drop-shadow(0 0 6px ${bowlingTeam.color || '#ef4444'})`;
+    if (bowler) bowler.style.filter = `drop-shadow(0 0 6px ${bowlingTeam.color || '#ef4444'})`;
 
     // Innings label
     el('local-innings-label').textContent = innings === 0 ? '1st Innings' : '2nd Innings';
@@ -460,6 +504,9 @@ const LocalMode = (() => {
     // Show/hide extra run button (only for authenticated scorer)
     const extraRunBtn = el('local-extra-run-btn');
     if (extraRunBtn) extraRunBtn.style.display = isAuthenticated ? 'block' : 'none';
+
+    // Draw/update stats charts
+    App.updateCharts(matchState, 'local');
   }
 
   /**

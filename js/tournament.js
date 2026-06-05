@@ -121,12 +121,18 @@ const TournamentMode = (() => {
     document.querySelectorAll('.playerB-input').forEach(inp => {
       playersB.push(inp.value.trim() || `Player ${inp.dataset.index}`);
     });
+    const colorA = el('tournament-colorA').value;
+    const logoA = el('tournament-logoA').value;
+    const colorB = el('tournament-colorB').value;
+    const logoB = el('tournament-logoB').value;
     const batFirst = parseInt(el('tournament-bat-first').value) || 0;
 
     matchState = CricketEngine.createMatch({
       mode: 'tournament',
       teamA, teamB,
       captainA, captainB,
+      colorA, logoA,
+      colorB, logoB,
       totalOvers: overs,
       playersPerTeam: players,
       playersA, playersB,
@@ -199,6 +205,10 @@ const TournamentMode = (() => {
 
     // Start listening for real-time updates from Firebase
     FirebaseSync.listenMatch(matchState.id, matchListener);
+    
+    // Initialize reactions
+    App.initReactions(matchState.id);
+    App.navigate('tournament-match');
   }
 
   /**
@@ -269,7 +279,7 @@ const TournamentMode = (() => {
     let animType = null;
 
     switch (action) {
-      case 'dot':  CricketEngine.addRuns(matchState, 0); break;
+      case 'dot':  CricketEngine.addRuns(matchState, 0); Animations.playPitchAnimation(0, 'tournament'); break;
       case '1':    CricketEngine.addRuns(matchState, 1); Animations.playPitchAnimation(1, 'tournament'); animType = 'run1'; break;
       case '2':    CricketEngine.addRuns(matchState, 2); Animations.playPitchAnimation(2, 'tournament'); animType = 'run2'; break;
       case '3':    CricketEngine.addRuns(matchState, 3); Animations.playPitchAnimation(3, 'tournament'); animType = 'run3'; break;
@@ -278,7 +288,7 @@ const TournamentMode = (() => {
       case '6':    CricketEngine.addRuns(matchState, 6); Animations.playPitchAnimation(6, 'tournament'); animType = 'six'; break;
       case 'wide': CricketEngine.addWide(matchState, 0); animType = 'wide'; break;
       case 'noball': CricketEngine.addNoBall(matchState, 0); animType = 'noball'; break;
-      case 'out':  CricketEngine.addWicket(matchState); animType = 'out'; break;
+      case 'out':  CricketEngine.addWicket(matchState); Animations.playPitchAnimation('out', 'tournament'); animType = 'out'; break;
       case 'extrarun': CricketEngine.addExtraRun(matchState); break;
       case 'undo': 
         if (CricketEngine.undo(matchState)) {
@@ -329,6 +339,7 @@ const TournamentMode = (() => {
     if (!matchState) return;
 
     const team = CricketEngine.getBattingTeam(matchState);
+    const bowlingTeam = CricketEngine.getBowlingTeam(matchState);
     const innings = matchState.currentInnings;
 
     // Tournament title
@@ -340,8 +351,41 @@ const TournamentMode = (() => {
     el('tournament-sb-captainA').textContent = matchState.teams[0].captain ? `C: ${matchState.teams[0].captain}` : '';
     el('tournament-sb-captainB').textContent = matchState.teams[1].captain ? `C: ${matchState.teams[1].captain}` : '';
 
-    el('tournament-teamA-badge').classList.toggle('batting', innings === 0);
-    el('tournament-teamB-badge').classList.toggle('batting', innings === 1);
+    const emblemA = el('tournament-emblem-teamA');
+    const emblemB = el('tournament-emblem-teamB');
+    if (emblemA) emblemA.textContent = matchState.teams[0].emblem || '🦁';
+    if (emblemB) emblemB.textContent = matchState.teams[1].emblem || '🐯';
+
+    // Badge borders and batting indicators
+    const badgeA = el('tournament-teamA-badge');
+    const badgeB = el('tournament-teamB-badge');
+    if (badgeA) {
+      badgeA.style.borderColor = matchState.teams[0].color || '#3b82f6';
+      badgeA.style.setProperty('--batting-glow', matchState.teams[0].color || '#3b82f6');
+    }
+    if (badgeB) {
+      badgeB.style.borderColor = matchState.teams[1].color || '#ef4444';
+      badgeB.style.setProperty('--batting-glow', matchState.teams[1].color || '#ef4444');
+    }
+    badgeA.classList.toggle('batting', innings === 0);
+    badgeB.classList.toggle('batting', innings === 1);
+
+    // Style runners with batting team colors
+    const runnerA = el('tournament-runner-a');
+    const runnerB = el('tournament-runner-b');
+    [runnerA, runnerB].forEach(runner => {
+      if (runner) {
+        runner.querySelectorAll('.p-head, .p-cap, .p-torso, .p-arm').forEach(part => {
+          part.style.backgroundColor = team.color || '#3b82f6';
+        });
+      }
+    });
+
+    // Style Bowler and Keeper with bowling team colors
+    const keeper = el('tournament-keeper-avatar');
+    const bowler = el('tournament-bowler-avatar');
+    if (keeper) keeper.style.filter = `drop-shadow(0 0 6px ${bowlingTeam.color || '#ef4444'})`;
+    if (bowler) bowler.style.filter = `drop-shadow(0 0 6px ${bowlingTeam.color || '#ef4444'})`;
 
     el('tournament-innings-label').textContent = innings === 0 ? '1st Innings' : '2nd Innings';
 
@@ -379,6 +423,9 @@ const TournamentMode = (() => {
     // Show/hide extra run button (only for authenticated scorer)
     const extraRunBtn = el('tournament-extra-run-btn');
     if (extraRunBtn) extraRunBtn.style.display = isAuthenticated ? 'block' : 'none';
+
+    // Draw/update stats charts
+    App.updateCharts(matchState, 'tournament');
   }
 
   function updateWicketIndicator(id, wickets, max) {
