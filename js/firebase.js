@@ -45,16 +45,18 @@ const FirebaseSync = (() => {
   /**
    * Push match state to Firebase (only authenticated devices should call)
    */
-  function syncState(state) {
-    if (!db || !state || !state.id) return;
+  async function syncState(state) {
+    if (!db || !state || !state.id) return false;
     try {
       // Create a lightweight copy to avoid uploading large history array
       const syncData = { ...state };
       delete syncData.history; // Only needed locally on scoring device
       
-      db.ref('matches/current/' + state.id).set(syncData);
+      await db.ref('matches/current/' + state.id).set(syncData);
+      return true;
     } catch (e) {
       console.warn('Firebase sync failed:', e);
+      return false;
     }
   }
 

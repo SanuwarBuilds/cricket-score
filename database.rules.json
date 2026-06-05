@@ -1,0 +1,26 @@
+{
+  "rules": {
+    "matches": {
+      "current": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    "score": {
+      "history": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    "analytics": {
+      "sessions": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    "settings": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}

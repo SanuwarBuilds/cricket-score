@@ -97,7 +97,10 @@ const LocalMode = (() => {
     });
 
     // Upload instantly to Firebase so viewers see it on the Home Screen immediately
-    FirebaseSync.syncState(matchState);
+    const synced = await FirebaseSync.syncState(matchState);
+    if (!synced) {
+      App.showToast('Live sync blocked. Update Firebase rules to show this match on other devices.', 6000);
+    }
 
     isAuthenticated = true; // Auto-authenticate the host creator
     updateAuthBanner();

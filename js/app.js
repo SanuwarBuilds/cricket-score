@@ -875,5 +875,5 @@ const App = (() => {
   // Init on DOM ready
   document.addEventListener('DOMContentLoaded', init);
 
-  return { navigate, showCinematicIntro };
+  return { navigate, showCinematicIntro, showToast };
 })();
