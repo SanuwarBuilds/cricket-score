@@ -7,6 +7,7 @@ const App = (() => {
   let currentScreen = 'home';
   let currentMode = null; // 'local' or 'tournament'
   let lastSharePayload = null;
+  let historyMatches = [];
 
   /**
    * Navigate to a screen
@@ -70,6 +71,8 @@ const App = (() => {
         
         // Reverse array to show newest first
         matches.reverse();
+        
+        historyMatches = matches;
 
         matches.forEach(m => {
           const date = new Date(m.date).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' });
@@ -616,6 +619,25 @@ const App = (() => {
       document.getElementById('btn-go-history').addEventListener('click', () => {
         navigate('history');
       });
+
+      // ---- History Scorecard Detail Click ----
+      const historyList = document.getElementById('history-list');
+      if (historyList) {
+        historyList.addEventListener('click', (e) => {
+          const card = e.target.closest('.history-card');
+          if (card) {
+            const matchId = card.getAttribute('data-id');
+            openHistoryDetail(matchId);
+          }
+        });
+      }
+
+      const histCloseBtn = document.getElementById('hist-modal-close');
+      if (histCloseBtn) {
+        histCloseBtn.addEventListener('click', () => {
+          hideModal('history-detail-modal');
+        });
+      }
 
       // ---- Theme Toggle Logic ----
       const btnToggleTheme = document.getElementById('btn-toggle-theme');
@@ -1221,6 +1243,116 @@ const App = (() => {
     setTimeout(() => {
       emojiEl.remove();
     }, duration * 1000);
+  }
+
+  function openHistoryDetail(matchId) {
+    const match = historyMatches.find(m => m.id === matchId);
+    if (!match) return;
+
+    const modal = document.getElementById('history-detail-modal');
+    if (!modal) return;
+
+    document.getElementById('hist-modal-title').textContent = `${match.teamA} vs ${match.teamB}`;
+    
+    const dateStr = new Date(match.date).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
+    const modeLabel = match.fullDetails?.mode === 'tournament' ? '🏆 Tournament Match' : '🏠 Local Match';
+    const tournamentStr = match.fullDetails?.tournamentName ? ` - ${match.fullDetails.tournamentName}` : '';
+    document.getElementById('hist-modal-meta').textContent = `${modeLabel}${tournamentStr} • ${dateStr}`;
+
+    const content = document.getElementById('hist-modal-content');
+    content.innerHTML = '';
+
+    if (match.fullDetails) {
+      const fd = match.fullDetails;
+      let html = '';
+      
+      if (fd.winMessage) {
+        html += `<div class="winner-msg-banner">🏆 ${escapeHTML(fd.winMessage)}</div>`;
+      }
+      
+      fd.teams.forEach((t, tIdx) => {
+        const battingColor = t.color || (tIdx === 0 ? '#3b82f6' : '#ef4444');
+        const teamOvers = Math.floor(t.balls / 6);
+        const teamBalls = t.balls % 6;
+        
+        html += `
+          <div class="hist-team-section">
+            <div class="hist-team-header">
+              <span class="hist-team-title" style="color: ${battingColor}">
+                <span>${t.emblem || '🏏'}</span>
+                <strong>${escapeHTML(t.name)}</strong>
+              </span>
+              <span class="hist-team-score">${t.runs}/${t.wickets} <span style="font-size:0.72rem; font-weight:500; color:var(--text-muted);">(${teamOvers}.${teamBalls} Ov)</span></span>
+            </div>
+        `;
+        
+        if (t.captain) {
+          html += `<div class="hist-team-captain">Captain: <strong>${escapeHTML(t.captain)}</strong></div>`;
+        }
+        
+        if (t.overSummaries && t.overSummaries.length > 0) {
+          html += `
+            <div class="hist-overs-title">Completed Overs</div>
+            <div class="hist-overs-list">
+          `;
+          t.overSummaries.forEach((over, oIdx) => {
+            let overRuns = 0;
+            const ballsHtml = over.map(ball => {
+              if (ball.label !== 'W') {
+                if (ball.label.startsWith('WD') || ball.label.startsWith('NB')) {
+                  const parts = ball.label.split('+');
+                  overRuns += 1 + (parts.length > 1 ? parseInt(parts[1]) : 0);
+                } else {
+                  const r = parseInt(ball.label);
+                  if (!isNaN(r)) overRuns += r;
+                }
+              }
+              return `<span class="mini-ball ${ball.class || ''}">${escapeHTML(ball.label)}</span>`;
+            }).join('');
+            
+            html += `
+              <div class="hist-over-row">
+                <span class="hist-over-num">Over ${oIdx + 1}</span>
+                <div class="hist-over-balls">${ballsHtml}</div>
+                <span class="recent-over-runs" style="margin-left:auto;">${overRuns}R</span>
+              </div>
+            `;
+          });
+          html += `</div>`;
+        } else {
+          html += `<div style="font-size:0.72rem; color:var(--text-muted); font-style:italic;">No completed overs.</div>`;
+        }
+
+        if (t.players && t.players.length > 0) {
+          html += `
+            <div class="hist-squad-section" style="margin-top: 10px; border-top:1px dashed rgba(255,255,255,0.06); padding-top:8px;">
+              <div class="hist-squad-title">Squad List</div>
+              <div class="hist-squad-list">${escapeHTML(t.players.join(', '))}</div>
+            </div>
+          `;
+        }
+
+        html += `</div>`;
+      });
+      
+      content.innerHTML = html;
+    } else {
+      content.innerHTML = `
+        <div class="hist-team-section">
+          <div style="font-size: 0.85rem; line-height: 1.6;">
+            <strong>${escapeHTML(match.teamA)}:</strong> ${match.runsA}/${match.wicketsA}<br>
+            <strong>${escapeHTML(match.teamB)}:</strong> ${match.runsB}/${match.wicketsB}<br>
+            <strong>Match Winner:</strong> ${escapeHTML(match.winner)}<br>
+            <strong>Match overs configured:</strong> ${match.overs} overs<br>
+            <p style="font-size:0.72rem; color:var(--text-muted); font-style:italic; margin-top:8px;">
+              Note: Full scorecard and ball-by-ball summaries are only available for matches played after this update.
+            </p>
+          </div>
+        </div>
+      `;
+    }
+
+    modal.classList.add('active');
   }
 
   return { navigate, showCinematicIntro, showToast, updateCharts, initReactions, destroyCharts };

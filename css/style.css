@@ -4988,3 +4988,166 @@ body.theme-basic .pw-live-label {
   90% { transform: translate(2px, 2px) rotate(0deg); }
   100% { transform: translate(1px, -2px) rotate(-1deg); }
 }
+
+/* History Scorecard Details Modal styling */
+.history-detail-modal {
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  background: rgba(10, 14, 26, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 229, 255, 0.25);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+}
+
+.hist-modal-meta {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: -6px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+
+.hist-scorecard-content {
+  overflow-y: auto;
+  flex: 1;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-right: 4px;
+}
+
+.winner-msg-banner {
+  background: rgba(250, 204, 21, 0.08);
+  border: 1px solid rgba(250, 204, 21, 0.25);
+  color: #facc15;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.hist-team-section {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.hist-team-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+}
+
+.hist-team-title {
+  font-weight: 800;
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hist-team-score {
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.hist-team-captain {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: -4px;
+  margin-bottom: 10px;
+}
+
+.hist-overs-title {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 8px;
+}
+
+.hist-overs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hist-over-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.03);
+  padding-bottom: 4px;
+}
+
+.hist-over-num {
+  font-weight: 700;
+  color: var(--text-muted);
+  min-width: 48px;
+}
+
+.hist-over-balls {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+
+.hist-squad-section {
+  margin-top: 4px;
+}
+
+.hist-squad-title {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 4px;
+}
+
+.hist-squad-list {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  font-style: italic;
+}
+
+body.theme-basic .history-detail-modal {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+}
+
+body.theme-basic .hist-team-section {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+body.theme-basic .hist-team-header {
+  border-bottom-color: #cbd5e1;
+}
+
+body.theme-basic .hist-team-score {
+  color: var(--text-primary);
+}
+
+body.theme-basic .winner-msg-banner {
+  background: #fef9c3;
+  border-color: #fef08a;
+  color: #a16207;
+}

@@ -66,6 +66,9 @@ const FirebaseSync = (() => {
   function saveMatchHistory(state) {
     if (!db || !state) return;
     try {
+      const details = JSON.parse(JSON.stringify(state));
+      delete details.history; // Remove large undo history array to optimize space
+      
       const historyData = {
         teamA: state.teams[0]?.name || 'Team A',
         teamB: state.teams[1]?.name || 'Team B',
@@ -75,7 +78,8 @@ const FirebaseSync = (() => {
         wicketsB: state.teams[1]?.wickets || 0,
         overs: state.totalOvers || 5,
         winner: state.winner || 'Unknown',
-        date: Date.now()
+        date: Date.now(),
+        fullDetails: details
       };
       db.ref('score/history').push(historyData);
       
