@@ -200,166 +200,88 @@ const Animations = (() => {
     eventOverlay.className = 'pitch-event-overlay';
     eventOverlay.innerHTML = '';
 
-    // Wicket (Out) Animation: Stumps LED flashing and ball deflection
+    // Trigger bowler action
+    if (bowler) {
+      bowler.classList.remove('is-bowling');
+      void bowler.offsetWidth;
+      bowler.classList.add('is-bowling');
+      setTimeout(() => bowler.classList.remove('is-bowling'), 1100);
+    }
+
+    // Trigger wicketkeeper catch action (if ball reaches keeper)
+    if (keeper && (runs === 0 || runs === 'dot' || runs === 'out')) {
+      setTimeout(() => {
+        keeper.classList.remove('is-catching');
+        void keeper.offsetWidth;
+        keeper.classList.add('is-catching');
+      }, 350);
+      setTimeout(() => keeper.classList.remove('is-catching'), 1500);
+    }
+
+    // Wicket (Out) Animation: Stumps LED flashing
     if (runs === 'out') {
-      if (leftStumps) {
-        leftStumps.classList.remove('led-glow');
-        void leftStumps.offsetWidth;
-        leftStumps.classList.add('led-glow');
-        setTimeout(() => leftStumps.classList.remove('led-glow'), 2500);
-      }
-      
-      if (bowler) {
-        bowler.classList.remove('is-bowling');
-        void bowler.offsetWidth;
-        bowler.classList.add('is-bowling');
-        setTimeout(() => bowler.classList.remove('is-bowling'), 1100);
-      }
-      if (keeper) {
-        keeper.classList.remove('is-catching');
-        void keeper.offsetWidth;
-        keeper.classList.add('is-catching');
-        setTimeout(() => keeper.classList.remove('is-catching'), 1200);
-      }
-
-      if (ball) {
-        ball.style.display = 'block';
-        ball.style.right = '12%';
-        ball.style.left = 'auto';
-        ball.style.top = '48%';
-        ball.style.transform = 'scale(1)';
-        ball.style.transition = 'none';
-        
-        setTimeout(() => {
-          ball.style.transition = 'left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), top 0.4s ease-out';
-          ball.style.left = '15%'; // hits stumps
-          ball.style.top = '50%';
-          
-          setTimeout(() => {
-            ball.style.transition = 'left 0.3s ease-out, top 0.3s ease-out';
-            ball.style.left = '9%';
-            ball.style.top = '32%'; // deflecting up
-            setTimeout(() => { ball.style.display = 'none'; }, 300);
-          }, 400);
-        }, 400);
-      }
-      return;
+      setTimeout(() => {
+        if (leftStumps) {
+          leftStumps.classList.remove('led-glow');
+          void leftStumps.offsetWidth;
+          leftStumps.classList.add('led-glow');
+          setTimeout(() => leftStumps.classList.remove('led-glow'), 2500);
+        }
+      }, 700);
     }
 
-    // Dot ball animation (bowler to batsman to keeper)
-    if (runs === 0 || runs === 'dot') {
-      if (bowler) {
-        bowler.classList.remove('is-bowling');
-        void bowler.offsetWidth;
-        bowler.classList.add('is-bowling');
-        setTimeout(() => bowler.classList.remove('is-bowling'), 1100);
-      }
-      if (keeper) {
-        keeper.classList.remove('is-catching');
-        void keeper.offsetWidth;
-        keeper.classList.add('is-catching');
-        setTimeout(() => keeper.classList.remove('is-catching'), 1100);
-      }
-
-      if (ball) {
-        ball.style.display = 'block';
-        ball.style.right = '12%';
-        ball.style.left = 'auto';
-        ball.style.top = '48%';
-        ball.style.transform = 'scale(1)';
-        ball.style.transition = 'none';
-        
-        setTimeout(() => {
-          ball.style.transition = 'left 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-          ball.style.left = '18%'; // batsman crease
-          
-          setTimeout(() => {
-            ball.style.transition = 'left 0.25s linear';
-            ball.style.left = '6%'; // keeper hands
-            setTimeout(() => { ball.style.display = 'none'; }, 250);
-          }, 450);
-        }, 400);
-      }
-      return;
-    }
-
-    // Boundary (4 or 6) animations
+    // Boundary event text overlay
     if (runs === 4 || runs === 6) {
-      eventOverlay.innerHTML = runs === 4 ? 'FOUR' : 'SIX';
-      eventOverlay.classList.add(runs === 4 ? 'show-four' : 'show-six');
-      
-      if (bowler) {
-        bowler.classList.remove('is-bowling');
-        void bowler.offsetWidth;
-        bowler.classList.add('is-bowling');
-        setTimeout(() => bowler.classList.remove('is-bowling'), 1100);
-      }
-      
-      if (ball) {
-        ball.style.display = 'block';
-        ball.style.right = '12%';
-        ball.style.left = 'auto';
-        ball.style.top = '48%';
-        ball.style.transform = 'scale(1)';
-        ball.style.transition = 'none';
-        
-        setTimeout(() => {
-          ball.style.transition = 'left 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), top 0.35s ease-out';
-          ball.style.left = '18%';
-          
-          setTimeout(() => {
-            ball.style.transition = 'left 0.4s ease-in, top 0.4s cubic-bezier(0.1, 0.8, 0.3, 1), transform 0.4s ease-out';
-            ball.style.left = '-100px';
-            ball.style.top = runs === 6 ? '-100px' : '120px';
-            ball.style.transform = 'scale(1.8)';
-            setTimeout(() => { ball.style.display = 'none'; }, 400);
-          }, 350);
-        }, 400);
-      }
-      return;
+      setTimeout(() => {
+        eventOverlay.innerHTML = runs === 4 ? 'FOUR' : 'SIX';
+        eventOverlay.classList.add(runs === 4 ? 'show-four' : 'show-six');
+      }, 700);
     }
 
-    // Normal runs (1-3)
+    // Ball Animation (CSS-Powered 3D Bounces)
+    if (ball) {
+      ball.style.display = 'block';
+      // Clear inline placement to allow CSS keyframe animations control
+      ball.style.left = '';
+      ball.style.right = '';
+      ball.style.top = '';
+      ball.style.transform = '';
+      ball.style.transition = '';
+      ball.className = 'pitch-ball';
+      void ball.offsetWidth; // trigger reflow
+
+      // Add appropriate animation class
+      if (runs === 0 || runs === 'dot') {
+        ball.classList.add('animate-dot');
+      } else if (runs === 'out') {
+        ball.classList.add('animate-out');
+      } else if (runs === 4) {
+        ball.classList.add('animate-four');
+      } else if (runs === 6) {
+        ball.classList.add('animate-six');
+      } else {
+        ball.classList.add('animate-runs');
+      }
+
+      // Hide ball when animation completes
+      setTimeout(() => {
+        ball.style.display = 'none';
+        ball.className = 'pitch-ball';
+      }, 1500);
+    }
+
+    // Normal runs (1-3) runner animation
     if (typeof runs === 'number' && runs >= 1 && runs <= 3) {
-      if (bowler) {
-        bowler.classList.remove('is-bowling');
-        void bowler.offsetWidth;
-        bowler.classList.add('is-bowling');
-        setTimeout(() => bowler.classList.remove('is-bowling'), 1100);
-      }
-
-      if (ball) {
-        ball.style.display = 'block';
-        ball.style.right = '12%';
-        ball.style.left = 'auto';
-        ball.style.top = '48%';
-        ball.style.transform = 'scale(1)';
-        ball.style.transition = 'none';
-        
-        setTimeout(() => {
-          ball.style.transition = 'left 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-          ball.style.left = '18%';
-          
-          setTimeout(() => {
-            ball.style.transition = 'left 0.6s ease-out, top 0.6s ease-out, transform 0.6s ease';
-            ball.style.left = '45%';
-            ball.style.top = '10%';
-            ball.style.transform = 'scale(0.6)';
-            setTimeout(() => { ball.style.display = 'none'; }, 600);
-          }, 350);
-        }, 400);
-      }
-
       runnerA.classList.add('is-running');
       runnerB.classList.add('is-running');
       if (!runnerA.dataset.pos) runnerA.dataset.pos = 'left';
       if (!runnerB.dataset.pos) runnerB.dataset.pos = 'right';
 
       const swapOnce = () => {
-        if (runnerA.dataset.pos === 'left') { runnerA.dataset.pos = 'right'; runnerA.style.left = '85%'; runnerA.dataset.dir = 'right'; }
-        else                                { runnerA.dataset.pos = 'left';  runnerA.style.left = '5%';  runnerA.dataset.dir = 'left'; }
-        if (runnerB.dataset.pos === 'right') { runnerB.dataset.pos = 'left';  runnerB.style.left = '5%';  runnerB.dataset.dir = 'left'; }
-        else                                 { runnerB.dataset.pos = 'right'; runnerB.style.left = '85%'; runnerB.dataset.dir = 'right'; }
+        if (runnerA.dataset.pos === 'left') { runnerA.dataset.pos = 'right'; runnerA.style.left = '80%'; runnerA.dataset.dir = 'right'; }
+        else                                { runnerA.dataset.pos = 'left';  runnerA.style.left = '18%';  runnerA.dataset.dir = 'left'; }
+        if (runnerB.dataset.pos === 'right') { runnerB.dataset.pos = 'left';  runnerB.style.left = '18%';  runnerB.dataset.dir = 'left'; }
+        else                                 { runnerB.dataset.pos = 'right'; runnerB.style.left = '80%'; runnerB.dataset.dir = 'right'; }
       };
 
       swapOnce();

@@ -2971,35 +2971,90 @@ body.theme-basic .history-team-row {
   flex-direction: column;
 }
 
-/* 20% Top Section: Pitch (No Scroll) */
+/* 28% Top Section: Pitch (No Scroll) */
 .pitch-container {
-  flex: 0 0 20%;
+  flex: 0 0 28%;
   position: relative;
   background:
-    radial-gradient(ellipse at center, rgba(255, 255, 255, 0.13), transparent 58%),
-    linear-gradient(to bottom, #103716, #1e642b 45%, #174b24);
+    radial-gradient(circle at 12% 0%, rgba(255, 255, 255, 0.2), transparent 35%),
+    radial-gradient(circle at 88% 0%, rgba(255, 255, 255, 0.2), transparent 35%),
+    repeating-linear-gradient(45deg, #134e1e 0 24px, #185e25 24px 48px);
   border-bottom: 2px solid var(--border-color);
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   perspective: 800px;
+  box-shadow: inset 0 -10px 30px rgba(0,0,0,0.5);
+}
+
+/* Stadium Boundary Rope */
+.pitch-container::before {
+  content: '';
+  position: absolute;
+  width: 106%;
+  height: 125%;
+  top: -12%;
+  left: -3%;
+  border: 3px solid rgba(255, 255, 255, 0.32);
+  border-radius: 50% / 22%;
+  pointer-events: none;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.15), inset 0 0 15px rgba(0, 0, 0, 0.5);
+  z-index: 2;
+}
+
+/* Scrolling LED Board */
+.pitch-container::after {
+  content: '⚡ QUICK CRICKET SCORE • PREMIUM LIVE SCORING • FOLLOW ON INSTAGRAM @IAM.SANUWAR • REAL-TIME FIREBASE SYNC • WORM & MANHATTAN GRAPH STATS • ⚡ QUICK CRICKET SCORE • PREMIUM LIVE SCORING • FOLLOW ON INSTAGRAM @IAM.SANUWAR • REAL-TIME FIREBASE SYNC • WORM & MANHATTAN GRAPH STATS •';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  background: rgba(8, 12, 22, 0.95);
+  color: #00e5ff;
+  font-family: 'Outfit', sans-serif;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  padding: 3.5px 0;
+  text-transform: uppercase;
+  border-bottom: 2px solid #00e5ff;
+  box-shadow: 0 3px 8px rgba(0, 229, 255, 0.3);
+  z-index: 15;
+  white-space: nowrap;
+  animation: scrollAds 24s linear infinite;
+}
+
+@keyframes scrollAds {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 /* Pitch Surface & Depth */
 .pitch-surface {
   position: relative;
-  width: 90%;
-  height: clamp(60px, 10vh, 90px);
+  width: 86%;
+  height: clamp(75px, 12vh, 102px);
   background:
-    repeating-linear-gradient(90deg, rgba(104, 72, 33, 0.08) 0 9px, transparent 9px 18px),
-    linear-gradient(90deg, #c9a974, #e1c990 50%, #c9a974);
-  border-radius: 4px;
-  border-top: 2px solid rgba(255, 255, 255, 0.4);
-  border-bottom: 2px solid rgba(255, 255, 255, 0.4);
-  transform: rotateX(15deg);
+    /* Bowling foothole wear patches */
+    radial-gradient(ellipse at 18% 50%, rgba(92, 63, 22, 0.22) 0%, transparent 22%),
+    radial-gradient(ellipse at 82% 50%, rgba(92, 63, 22, 0.22) 0%, transparent 22%),
+    /* Soil clay turf mix */
+    linear-gradient(to right, 
+      #bfa576 0%, 
+      #d0b98f 15%, 
+      #dfcfad 50%, 
+      #d0b98f 85%, 
+      #bfa576 100%
+    );
+  border-radius: 8px;
+  border-top: 1.5px solid rgba(255, 255, 255, 0.35);
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.35);
+  transform: rotateX(20deg);
   transform-style: preserve-3d;
-  box-shadow: inset 0 0 34px rgba(88, 52, 12, 0.26), 0 14px 34px rgba(0, 0, 0, 0.42);
+  box-shadow: 
+    0 12px 28px rgba(0, 0, 0, 0.6), 
+    inset 0 0 16px rgba(100, 68, 28, 0.3);
 }
 
 /* Pitch Creases */
@@ -3010,11 +3065,11 @@ body.theme-basic .history-team-row {
 
 .crease {
   position: absolute;
-  width: 2px;
+  width: 2.5px;
   height: 100%;
   top: 0;
-  background: rgba(255, 255, 255, 0.85);
-  box-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.15);
 }
 
 .left-crease {
@@ -3025,22 +3080,39 @@ body.theme-basic .history-team-row {
   right: 15%;
 }
 
+/* Return creases using pseudo-elements */
+.crease::before,
+.crease::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.left-crease::before { top: 0; left: 0; }
+.left-crease::after { bottom: 0; left: 0; }
+.right-crease::before { top: 0; right: 0; }
+.right-crease::after { bottom: 0; right: 0; }
+
 /* Stumps */
 .stumps {
   position: absolute;
-  width: 12px;
-  height: 30px;
+  width: 14px;
+  height: 38px;
   top: 50%;
-  transform: translateY(-50%);
-  z-index: 6;
+  transform-origin: bottom center;
+  transform: translateY(-90%) rotateX(-20deg); /* Stand upright */
+  z-index: 10;
   background-image:
     linear-gradient(to right,
-      #ffb042 0px, #ffb042 2px,
-      transparent 2px, transparent 5px,
-      #ffb042 5px, #ffb042 7px,
-      transparent 7px, transparent 10px,
-      #ffb042 10px, #ffb042 12px);
-  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.4));
+      #d99f4d 0px, #d99f4d 2.5px,
+      transparent 2.5px, transparent 5px,
+      #d99f4d 5px, #d99f4d 7.5px,
+      transparent 7.5px, transparent 10px,
+      #d99f4d 10px, #d99f4d 12.5px);
+  filter: drop-shadow(0 8px 6px rgba(0, 0, 0, 0.6));
+  transition: transform 0.3s ease;
 }
 
 .stumps::after {
@@ -3048,20 +3120,21 @@ body.theme-basic .history-team-row {
   position: absolute;
   top: -3px;
   left: -1px;
-  width: 14px;
+  width: 16px;
   height: 3px;
-  background: #ffb042;
+  background: #c2883c;
   border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
 .left-stumps {
   left: 15%;
-  margin-left: -6px;
+  margin-left: -7px;
 }
 
 .right-stumps {
   right: 15%;
-  margin-right: -6px;
+  margin-right: -7px;
 }
 
 /* Pitch Runners (Player Graphics) */
@@ -3071,12 +3144,12 @@ body.theme-basic .history-team-row {
   height: 55px;
   left: 50%;
   top: 50%;
-  transform: translateX(-50%) translateY(-50%);
+  transform-origin: bottom center;
+  transform: translateY(-96%) rotateX(-20deg); /* Stand upright */
   background-color: transparent;
   transition: left 1s ease-in-out, scale 0.2s ease;
-  z-index: 5;
-  filter: drop-shadow(0 5px 6px rgba(0, 0, 0, 0.5));
-  scale: 1 1;
+  z-index: 11;
+  filter: drop-shadow(0 8px 6px rgba(0, 0, 0, 0.5));
 }
 
 .runner[data-dir="left"] {
@@ -3208,12 +3281,12 @@ body.theme-basic .history-team-row {
 /* Layout lanes */
 .runner-a {
   top: 30%;
-  left: 5%;
+  left: 18%;
 }
 
 .runner-b {
   top: 70%;
-  left: 85%;
+  left: 80%;
 }
 
 /* Realistic Running Animation Keyframes */
@@ -4393,22 +4466,23 @@ body.theme-basic .pw-live-label {
   position: absolute;
   width: 30px;
   height: 52px;
-  z-index: 6;
+  z-index: 12;
   --fielder-color: #ef4444;
-  filter: drop-shadow(0 3px 5px rgba(0,0,0,0.4));
+  filter: drop-shadow(0 8px 6px rgba(0,0,0,0.5));
+  transform-origin: bottom center;
   transition: transform 0.2s ease;
 }
 
 .fielder-keeper {
   top: 56%;
   left: 3.5%;
-  transform: translateY(-50%) scale(0.9);
+  transform: translateY(-90%) rotateX(-20deg) scale(0.95);
 }
 
 .fielder-bowler {
   top: 47%;
   right: 3.5%;
-  transform: translateY(-50%) scaleX(-1);
+  transform: translateY(-90%) rotateX(-20deg) scaleX(-1);
 }
 
 .pitch-fielder .p-head,
@@ -4500,11 +4574,11 @@ body.theme-basic .pw-live-label {
 }
 
 @keyframes bowlerRunDelivery {
-  0% { transform: translateY(-50%) translateX(0) scaleX(-1); }
-  30% { transform: translateY(-50%) translateX(-20px) scaleX(-1) rotate(-8deg); }
-  58% { transform: translateY(-50%) translateX(-30px) scaleX(-1) rotate(18deg); }
-  78% { transform: translateY(-50%) translateX(-18px) scaleX(-1) rotate(6deg); }
-  100% { transform: translateY(-50%) translateX(0) scaleX(-1); }
+  0% { transform: translateY(-90%) rotateX(-20deg) translateX(0) scaleX(-1); }
+  30% { transform: translateY(-90%) rotateX(-20deg) translateX(-20px) scaleX(-1) rotate(-8deg); }
+  58% { transform: translateY(-90%) rotateX(-20deg) translateX(-30px) scaleX(-1) rotate(18deg); }
+  78% { transform: translateY(-90%) rotateX(-20deg) translateX(-18px) scaleX(-1) rotate(6deg); }
+  100% { transform: translateY(-90%) rotateX(-20deg) translateX(0) scaleX(-1); }
 }
 
 @keyframes bowlArmWhip {
@@ -4520,13 +4594,180 @@ body.theme-basic .pw-live-label {
 }
 
 @keyframes keeperTake {
-  0%, 100% { transform: translateY(-50%) scale(0.9); }
-  55% { transform: translateY(-42%) translateX(8px) scale(0.92); }
+  0%, 100% { transform: translateY(-90%) rotateX(-20deg) scale(0.95); }
+  55% { transform: translateY(-82%) rotateX(-20deg) translateX(8px) scale(0.98); }
 }
 
 @keyframes gloveCatch {
   0%, 45%, 100% { top: 37px; }
   65% { top: 28px; }
+}
+
+/* Outfield Tactical Fielders styling */
+.field-fielder {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background: var(--fielder-color, #ef4444);
+  border: 1.5px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Outfit', sans-serif;
+  font-size: 8px;
+  font-weight: 800;
+  color: #ffffff;
+  z-index: 4;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-origin: bottom center;
+}
+
+.field-fielder:hover {
+  transform: scale(1.25) translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.5), 0 0 8px var(--fielder-color);
+}
+
+/* Ball Delivery Physics (3D Bouncing) keyframes */
+@keyframes deliveryDot {
+  0% {
+    left: 88%;
+    top: 48%;
+    transform: scale(0.9);
+    opacity: 1;
+  }
+  35% {
+    left: 50%;
+    top: 66%; /* Bounces on pitch */
+    transform: scale(0.72);
+  }
+  75% {
+    left: 18%;
+    top: 44%; /* Hits bat height */
+    transform: scale(0.85);
+  }
+  100% {
+    left: 5%;
+    top: 52%; /* Keeper catches */
+    transform: scale(0.78);
+    opacity: 0.9;
+  }
+}
+
+@keyframes deliveryOut {
+  0% {
+    left: 88%;
+    top: 48%;
+    transform: scale(0.9);
+    opacity: 1;
+  }
+  35% {
+    left: 50%;
+    top: 66%;
+    transform: scale(0.72);
+  }
+  75% {
+    left: 15%;
+    top: 50%; /* Hits stumps */
+    transform: scale(0.8);
+  }
+  90% {
+    left: 10%;
+    top: 35%; /* Deflects up */
+    transform: scale(0.78);
+  }
+  100% {
+    left: 5%;
+    top: 25%;
+    transform: scale(0.7);
+    opacity: 0;
+  }
+}
+
+@keyframes deliveryFour {
+  0% {
+    left: 88%;
+    top: 48%;
+    transform: scale(0.9);
+    opacity: 1;
+  }
+  30% {
+    left: 50%;
+    top: 66%;
+    transform: scale(0.72);
+  }
+  65% {
+    left: 18%;
+    top: 44%; /* Hits bat */
+    transform: scale(0.85);
+  }
+  85% {
+    left: -15%;
+    top: 75%; /* Bounces in outfield */
+    transform: scale(1.1);
+  }
+  100% {
+    left: -50px;
+    top: 85%; /* Passes boundary */
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+@keyframes deliverySix {
+  0% {
+    left: 88%;
+    top: 48%;
+    transform: scale(0.9);
+    opacity: 1;
+  }
+  30% {
+    left: 50%;
+    top: 66%;
+    transform: scale(0.72);
+  }
+  65% {
+    left: 18%;
+    top: 44%; /* Hits bat */
+    transform: scale(0.85);
+  }
+  85% {
+    left: -30px;
+    top: -50px; /* High aerial trajectory */
+    transform: scale(1.9);
+  }
+  100% {
+    left: -100px;
+    top: -100px;
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+@keyframes deliveryRuns {
+  0% {
+    left: 88%;
+    top: 48%;
+    transform: scale(0.9);
+    opacity: 1;
+  }
+  35% {
+    left: 50%;
+    top: 66%;
+    transform: scale(0.72);
+  }
+  70% {
+    left: 18%;
+    top: 44%;
+    transform: scale(0.85);
+  }
+  100% {
+    left: 45%;
+    top: 10%; /* Rolls to outfield */
+    transform: scale(0.65);
+    opacity: 0;
+  }
 }
 
 .pitch-ball {
@@ -4535,9 +4776,29 @@ body.theme-basic .pw-live-label {
   height: 7px;
   background: radial-gradient(circle, #ff2c4b 0%, #b3001e 80%);
   border-radius: 50%;
-  z-index: 7;
+  z-index: 15;
   box-shadow: 0 0 10px rgba(255, 44, 75, 0.8), 0 0 4px rgba(255, 44, 75, 0.4);
   will-change: left, top;
+}
+
+.pitch-ball.animate-dot {
+  animation: deliveryDot 0.95s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.pitch-ball.animate-out {
+  animation: deliveryOut 0.95s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.pitch-ball.animate-four {
+  animation: deliveryFour 1.15s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.pitch-ball.animate-six {
+  animation: deliverySix 1.15s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.pitch-ball.animate-runs {
+  animation: deliveryRuns 1.05s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 .stumps.led-glow {
@@ -4547,10 +4808,10 @@ body.theme-basic .pw-live-label {
 @keyframes stumpsLEDGlow {
   0% {
     filter: drop-shadow(0 0 0px #ff0055);
-    background-image: linear-gradient(to right, #ffb042, transparent, #ffb042);
+    background-image: linear-gradient(to right, #d99f4d, transparent, #d99f4d);
   }
   100% {
-    filter: drop-shadow(0 0 12px #ff0055) brightness(1.6);
+    filter: drop-shadow(0 0 15px #ff0055) brightness(1.8);
     background-color: #ff0055;
     background-image: none;
   }

@@ -381,18 +381,19 @@ const TournamentMode = (() => {
       }
     });
 
-    // Style Bowler and Keeper with bowling team colors
-    const keeper = el('tournament-keeper-avatar');
-    const bowler = el('tournament-bowler-avatar');
-    [keeper, bowler].forEach(fielder => {
-      if (fielder) {
-        const color = bowlingTeam.color || '#ef4444';
-        fielder.style.setProperty('--fielder-color', color);
-        fielder.style.filter = `drop-shadow(0 0 6px ${color})`;
-        fielder.querySelectorAll('.p-head, .p-cap, .p-torso, .p-arm').forEach(part => {
-          part.style.backgroundColor = color;
-        });
+    // Style Bowler, Keeper, and Outfield fielders with bowling team colors
+    const fielders = document.querySelectorAll('#tournament-pitch-container .pitch-fielder, #tournament-pitch-container .field-fielder');
+    fielders.forEach(fielder => {
+      const color = bowlingTeam.color || '#ef4444';
+      fielder.style.setProperty('--fielder-color', color);
+      if (fielder.classList.contains('pitch-fielder')) {
+        fielder.style.filter = `drop-shadow(0 8px 6px rgba(0,0,0,0.5)) drop-shadow(0 0 4px ${color})`;
+      } else {
+        fielder.style.boxShadow = `0 4px 6px rgba(0,0,0,0.4), 0 0 8px ${color}`;
       }
+      fielder.querySelectorAll('.p-head, .p-cap, .p-torso, .p-arm').forEach(part => {
+        part.style.backgroundColor = color;
+      });
     });
 
     el('tournament-innings-label').textContent = innings === 0 ? '1st Innings' : '2nd Innings';
