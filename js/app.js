@@ -402,6 +402,8 @@ const App = (() => {
 
     // Start listening globally for active matches to show on Home Screen
     const matchesContainer = document.getElementById('live-matches-container');
+    const joinCodeCard = document.getElementById('join-code-card');
+    const joinCodeToggle = document.getElementById('btn-toggle-join-code');
     const joinCodeInput = document.getElementById('join-match-code');
     const joinCodeError = document.getElementById('join-code-error');
     const joinCodeBtn = document.getElementById('btn-join-code');
@@ -501,15 +503,24 @@ const App = (() => {
       }
     });
 
+    if (joinCodeToggle && joinCodeCard && joinCodeInput) {
+      joinCodeToggle.addEventListener('click', () => {
+        const isCollapsed = joinCodeCard.classList.toggle('collapsed');
+        if (!isCollapsed) joinCodeInput.focus();
+      });
+    }
+
     if (joinCodeBtn && joinCodeInput) {
       joinCodeBtn.addEventListener('click', () => {
         const match = findMatchByCode(joinCodeInput.value);
         if (match) {
           joinCodeError.textContent = '';
           joinCodeInput.value = '';
+          if (joinCodeCard) joinCodeCard.classList.add('collapsed');
           joinLiveMatch(match);
         } else {
           joinCodeError.textContent = 'No live match found for this code.';
+          if (joinCodeCard) joinCodeCard.classList.remove('collapsed');
         }
       });
       joinCodeInput.addEventListener('keydown', (e) => {
