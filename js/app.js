@@ -662,6 +662,22 @@ const App = (() => {
             localStorage.setItem('app_theme', 'premium');
             btnToggleTheme.textContent = '⚪ Switch to Basic White Theme';
           }
+          
+          // Force redraw charts if a match is active
+          const activeMatchState = (typeof LocalMode !== 'undefined' && typeof TournamentMode !== 'undefined')
+            ? (LocalMode.getState() || TournamentMode.getState())
+            : null;
+          if (activeMatchState) {
+            const activeScreen = document.querySelector('.screen.active');
+            if (activeScreen) {
+              const activeId = activeScreen.id;
+              if (activeId === 'screen-local-match') {
+                updateCharts(activeMatchState, 'local', true);
+              } else if (activeId === 'screen-tournament-match') {
+                updateCharts(activeMatchState, 'tournament', true);
+              }
+            }
+          }
         });
       }
 
@@ -990,6 +1006,12 @@ const App = (() => {
     const canvasManhattan = document.getElementById(`${mode}-manhattan-canvas`);
     if (!canvasWorm || !canvasManhattan) return;
 
+    // Check theme state
+    const isBasicTheme = document.body.classList.contains('theme-basic');
+    const chartLabelColor = isBasicTheme ? '#0f172a' : '#fff';
+    const chartGridColor = isBasicTheme ? 'rgba(15, 23, 42, 0.08)' : 'rgba(255,255,255,0.05)';
+    const chartTicksColor = isBasicTheme ? '#475569' : '#889';
+
     // If match ID changed, clean up previous chart instances
     if (lastChartMatchId !== state.id) {
       destroyCharts();
@@ -1073,11 +1095,11 @@ const App = (() => {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { labels: { color: '#fff', font: { family: 'Outfit', size: 10 } } }
+            legend: { labels: { color: chartLabelColor, font: { family: 'Outfit', size: 10 } } }
           },
           scales: {
-            x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#889' } },
-            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#889' }, min: 0 }
+            x: { grid: { color: chartGridColor }, ticks: { color: chartTicksColor } },
+            y: { grid: { color: chartGridColor }, ticks: { color: chartTicksColor }, min: 0 }
           }
         }
       });
@@ -1130,11 +1152,11 @@ const App = (() => {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { labels: { color: '#fff', font: { family: 'Outfit', size: 10 } } }
+            legend: { labels: { color: chartLabelColor, font: { family: 'Outfit', size: 10 } } }
           },
           scales: {
-            x: { grid: { display: false }, ticks: { color: '#889' } },
-            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#889' }, min: 0 }
+            x: { grid: { display: false }, ticks: { color: chartTicksColor } },
+            y: { grid: { color: chartGridColor }, ticks: { color: chartTicksColor }, min: 0 }
           }
         }
       });
@@ -1325,7 +1347,7 @@ const App = (() => {
 
         if (t.players && t.players.length > 0) {
           html += `
-            <div class="hist-squad-section" style="margin-top: 10px; border-top:1px dashed rgba(255,255,255,0.06); padding-top:8px;">
+            <div class="hist-squad-section" style="margin-top: 10px; border-top:1px dashed var(--border-color); padding-top:8px;">
               <div class="hist-squad-title">Squad List</div>
               <div class="hist-squad-list">${escapeHTML(t.players.join(', '))}</div>
             </div>

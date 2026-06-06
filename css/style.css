@@ -33,20 +33,26 @@
 
 body.theme-basic {
   /* Basic White Theme Overrides */
-  --bg-primary: #f8f9fa;
+  --bg-primary: #f1f5f9;
   --bg-secondary: #ffffff;
-  --bg-card: rgba(255, 255, 255, 0.95);
-  --bg-glass: rgba(0, 0, 0, 0.05);
-  --text-primary: #1e293b;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
+  --bg-card: #ffffff;
+  --bg-glass: rgba(0, 0, 0, 0.04);
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #576574;
   --accent: #2563eb;
   --accent-glow: rgba(37, 99, 235, 0.1);
   --green: #16a34a;
   --green-glow: rgba(22, 163, 74, 0.1);
   --red: #dc2626;
   --red-glow: rgba(220, 38, 38, 0.1);
-  --border-color: rgba(0, 0, 0, 0.1);
+  --yellow: #a16207;
+  --yellow-glow: rgba(161, 98, 7, 0.1);
+  --orange: #c2410c;
+  --orange-glow: rgba(194, 65, 12, 0.1);
+  --purple: #7e22ce;
+  --purple-glow: rgba(126, 34, 206, 0.1);
+  --border-color: rgba(15, 23, 42, 0.08);
 }
 
 /* ---- Reset ---- */
@@ -633,6 +639,155 @@ body.theme-basic .mode-icon {
   background: var(--bg-primary);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
+}
+
+/* --- Basic Theme Component Overrides --- */
+
+/* Buttons & Active/Tap states */
+body.theme-basic .run-btn:active,
+body.theme-basic .extra-btn.undo:active,
+body.theme-basic .action-btn:active,
+body.theme-basic .menu-btn:active,
+body.theme-basic .dropdown-item:active {
+  background: rgba(0, 0, 0, 0.08) !important;
+}
+
+body.theme-basic .lsetup-start-btn {
+  color: #ffffff !important;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2) !important;
+}
+body.theme-basic .lsetup-start-btn::after {
+  box-shadow: none !important;
+}
+
+body.theme-basic .panel-tab.active {
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15) !important;
+}
+
+body.theme-basic .extra-run-btn {
+  background: var(--orange-glow) !important;
+  border-color: rgba(194, 65, 12, 0.3) !important;
+}
+
+body.theme-basic .teams-vs-badge {
+  background: var(--accent-glow) !important;
+  border-color: rgba(37, 99, 235, 0.2) !important;
+  box-shadow: none !important;
+}
+
+body.theme-basic .team-badge.batting {
+  background: var(--accent-glow) !important;
+  border-color: var(--accent) !important;
+  box-shadow: none !important;
+}
+
+body.theme-basic .premium-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23475569' d='M6 8L1 3h10z'/%3E%3C/svg%3E") !important;
+}
+
+/* Sliders / Toggles */
+body.theme-basic .toggle-slider {
+  background: rgba(0, 0, 0, 0.08) !important;
+}
+
+body.theme-basic .toggle-switch input:checked+.toggle-slider {
+  background: var(--accent-glow) !important;
+}
+
+/* Scorecard & Ball summaries */
+body.theme-basic .scorecard-over {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+body.theme-basic .mini-ball {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text-primary);
+}
+
+body.theme-basic .mini-ball.four,
+body.theme-basic .mini-ball.boundary-four {
+  background: rgba(37, 99, 235, 0.12) !important;
+  color: #2563eb !important;
+}
+
+body.theme-basic .mini-ball.six,
+body.theme-basic .mini-ball.boundary-six {
+  background: rgba(126, 34, 206, 0.12) !important;
+  color: #7e22ce !important;
+}
+
+body.theme-basic .mini-ball.wicket {
+  background: rgba(220, 38, 38, 0.12) !important;
+  color: #dc2626 !important;
+}
+
+body.theme-basic .mini-ball.wide,
+body.theme-basic .mini-ball.noball,
+body.theme-basic .mini-ball.extra {
+  background: rgba(16, 163, 74, 0.12) !important;
+  color: #16a34a !important;
+}
+
+body.theme-basic .ball-tag {
+  background: var(--bg-primary) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+body.theme-basic .recent-overs-list .mini-ball {
+  background: rgba(0, 0, 0, 0.06) !important;
+  color: var(--text-primary) !important;
+}
+
+body.theme-basic .recent-overs-list .mini-ball.four {
+  background: rgba(22, 163, 74, 0.15) !important;
+  color: #16a34a !important;
+  border-color: rgba(22, 163, 74, 0.3) !important;
+}
+
+body.theme-basic .recent-overs-list .mini-ball.six {
+  background: rgba(126, 34, 206, 0.15) !important;
+  color: #7e22ce !important;
+  border-color: rgba(126, 34, 206, 0.3) !important;
+}
+
+body.theme-basic .recent-overs-list .mini-ball.wicket {
+  background: rgba(220, 38, 38, 0.15) !important;
+  color: #dc2626 !important;
+  border-color: rgba(220, 38, 38, 0.3) !important;
+}
+
+body.theme-basic .recent-overs-list .mini-ball.wide,
+body.theme-basic .recent-overs-list .mini-ball.noball {
+  background: rgba(161, 98, 7, 0.15) !important;
+  color: #a16207 !important;
+  border-color: rgba(161, 98, 7, 0.3) !important;
+}
+
+body.theme-basic .recent-over-runs {
+  background: rgba(0, 0, 0, 0.05) !important;
+}
+
+body.theme-basic .hist-over-row {
+  border-bottom-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Privacy Cookie Consent */
+body.theme-basic .privacy-consent {
+  background: #ffffff !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12) !important;
+}
+
+body.theme-basic .privacy-actions button {
+  background: rgba(0, 0, 0, 0.05) !important;
+  color: var(--text-primary) !important;
+}
+
+body.theme-basic .privacy-actions button[data-consent="allow"] {
+  background: linear-gradient(135deg, var(--accent), var(--green)) !important;
+  color: #ffffff !important;
 }
 
 /* Ripple */
