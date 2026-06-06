@@ -192,6 +192,7 @@ const Animations = (() => {
     const eventOverlay = document.getElementById(modePrefix + '-pitch-event');
     const ball = document.getElementById(modePrefix + '-pitch-ball');
     const bowler = document.getElementById(modePrefix + '-bowler-avatar');
+    const keeper = document.getElementById(modePrefix + '-keeper-avatar');
     const leftStumps = document.querySelector('#' + modePrefix + '-pitch-container .left-stumps');
 
     if (!runnerA || !runnerB || !eventOverlay) return;
@@ -213,6 +214,12 @@ const Animations = (() => {
         void bowler.offsetWidth;
         bowler.classList.add('is-bowling');
         setTimeout(() => bowler.classList.remove('is-bowling'), 1100);
+      }
+      if (keeper) {
+        keeper.classList.remove('is-catching');
+        void keeper.offsetWidth;
+        keeper.classList.add('is-catching');
+        setTimeout(() => keeper.classList.remove('is-catching'), 1200);
       }
 
       if (ball) {
@@ -246,6 +253,12 @@ const Animations = (() => {
         void bowler.offsetWidth;
         bowler.classList.add('is-bowling');
         setTimeout(() => bowler.classList.remove('is-bowling'), 1100);
+      }
+      if (keeper) {
+        keeper.classList.remove('is-catching');
+        void keeper.offsetWidth;
+        keeper.classList.add('is-catching');
+        setTimeout(() => keeper.classList.remove('is-catching'), 1100);
       }
 
       if (ball) {

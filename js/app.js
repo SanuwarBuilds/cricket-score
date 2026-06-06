@@ -42,6 +42,12 @@ const App = (() => {
     window.scrollTo(0, 0);
   }
 
+  function escapeHTML(value) {
+    return String(value ?? '').replace(/[&<>"']/g, ch => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[ch]));
+  }
+
   /**
    * Load History Data
    */
@@ -67,22 +73,32 @@ const App = (() => {
 
         matches.forEach(m => {
           const date = new Date(m.date).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' });
+          const teamA = m.teamA || 'Team A';
+          const teamB = m.teamB || 'Team B';
+          const scoreA = `${m.runsA || 0}/${m.wicketsA || 0}`;
+          const scoreB = `${m.runsB || 0}/${m.wicketsB || 0}`;
+          const winner = m.winner || 'Unknown';
+          const winnerClass = winner === teamA ? 'winner-a' : winner === teamB ? 'winner-b' : '';
           html += `
-            <div class="history-card" data-id="${m.id}">
+            <div class="history-card ${winnerClass}" data-id="${escapeHTML(m.id)}">
               <div class="history-header">
-                <span>${date}</span>
-                <span>${m.overs || 0} Overs</span>
+                <span>${escapeHTML(date)}</span>
+                <span class="history-chip">${m.overs || 0} Overs</span>
               </div>
-              <div class="history-teams">
-                <span>${m.teamA}</span>
-                <span style="font-size:0.8rem;color:var(--text-muted);font-weight:400;">vs</span>
-                <span>${m.teamB}</span>
+              <div class="history-versus">
+                <div class="history-team-row">
+                  <span class="history-team-name">${escapeHTML(teamA)}</span>
+                  <span class="history-score-pill">${escapeHTML(scoreA)}</span>
+                </div>
+                <div class="history-team-row">
+                  <span class="history-team-name">${escapeHTML(teamB)}</span>
+                  <span class="history-score-pill">${escapeHTML(scoreB)}</span>
+                </div>
               </div>
-              <div style="display:flex; justify-content:space-between; margin-top:4px;">
-                <span class="history-score">${m.runsA}/${m.wicketsA}</span>
-                <span class="history-score">${m.runsB}/${m.wicketsB}</span>
+              <div class="history-result">
+                <span class="history-winner-badge">Winner</span>
+                <strong>${escapeHTML(winner)}</strong>
               </div>
-              <div class="history-winner">Winner: ${m.winner}</div>
             </div>
           `;
         });
@@ -605,7 +621,7 @@ const App = (() => {
       const btnToggleTheme = document.getElementById('btn-toggle-theme');
       if (btnToggleTheme) {
         // Init theme state from local storage
-        const savedTheme = localStorage.getItem('app_theme') || 'premium';
+        const savedTheme = localStorage.getItem('app_theme') || 'basic';
         if (savedTheme === 'basic') {
           document.body.classList.add('theme-basic');
           btnToggleTheme.textContent = '⚫ Switch to Premium Theme';

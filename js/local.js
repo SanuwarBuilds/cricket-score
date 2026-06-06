@@ -458,8 +458,16 @@ const LocalMode = (() => {
     // Style Bowler and Keeper with bowling team's color
     const keeper = el('local-keeper-avatar');
     const bowler = el('local-bowler-avatar');
-    if (keeper) keeper.style.filter = `drop-shadow(0 0 6px ${bowlingTeam.color || '#ef4444'})`;
-    if (bowler) bowler.style.filter = `drop-shadow(0 0 6px ${bowlingTeam.color || '#ef4444'})`;
+    [keeper, bowler].forEach(fielder => {
+      if (fielder) {
+        const color = bowlingTeam.color || '#ef4444';
+        fielder.style.setProperty('--fielder-color', color);
+        fielder.style.filter = `drop-shadow(0 0 6px ${color})`;
+        fielder.querySelectorAll('.p-head, .p-cap, .p-torso, .p-arm').forEach(part => {
+          part.style.backgroundColor = color;
+        });
+      }
+    });
 
     // Innings label
     el('local-innings-label').textContent = innings === 0 ? '1st Innings' : '2nd Innings';

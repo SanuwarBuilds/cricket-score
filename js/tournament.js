@@ -384,8 +384,16 @@ const TournamentMode = (() => {
     // Style Bowler and Keeper with bowling team colors
     const keeper = el('tournament-keeper-avatar');
     const bowler = el('tournament-bowler-avatar');
-    if (keeper) keeper.style.filter = `drop-shadow(0 0 6px ${bowlingTeam.color || '#ef4444'})`;
-    if (bowler) bowler.style.filter = `drop-shadow(0 0 6px ${bowlingTeam.color || '#ef4444'})`;
+    [keeper, bowler].forEach(fielder => {
+      if (fielder) {
+        const color = bowlingTeam.color || '#ef4444';
+        fielder.style.setProperty('--fielder-color', color);
+        fielder.style.filter = `drop-shadow(0 0 6px ${color})`;
+        fielder.querySelectorAll('.p-head, .p-cap, .p-torso, .p-arm').forEach(part => {
+          part.style.backgroundColor = color;
+        });
+      }
+    });
 
     el('tournament-innings-label').textContent = innings === 0 ? '1st Innings' : '2nd Innings';
 

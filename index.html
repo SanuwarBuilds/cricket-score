@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="description" content="Quick Cricket Score — premium live cricket scoring tool. Score local and tournament matches in real-time with smooth animations.">
-  <meta name="theme-color" content="#0a0e1a">
+  <meta name="theme-color" content="#f8f9fa">
   <link rel="manifest" href="manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,7 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css?v=3.1">
 </head>
-<body>
+<body class="theme-basic">
 
   <!-- ==================== HOME SCREEN ==================== -->
   <section id="screen-home" class="screen active">
@@ -350,8 +350,29 @@
             <div class="crease right-crease"></div>
             <div class="stumps right-stumps"></div>
             <!-- Wicketkeeper & Bowler Graphic -->
-            <div class="pitch-fielder fielder-keeper" id="local-keeper-avatar">🧤</div>
-            <div class="pitch-fielder fielder-bowler" id="local-bowler-avatar">🏃</div>
+            <div class="pitch-fielder fielder-keeper" id="local-keeper-avatar" aria-label="Wicket keeper">
+              <div class="player-graphic">
+                <div class="p-arm p-arm-back"></div>
+                <div class="p-glove glove-back"></div>
+                <div class="p-leg p-leg-back"></div>
+                <div class="p-torso"></div>
+                <div class="p-head"><div class="p-cap"></div></div>
+                <div class="p-leg p-leg-front"></div>
+                <div class="p-arm p-arm-front"></div>
+                <div class="p-glove glove-front"></div>
+              </div>
+            </div>
+            <div class="pitch-fielder fielder-bowler" id="local-bowler-avatar" aria-label="Bowler">
+              <div class="player-graphic">
+                <div class="p-arm p-arm-back"></div>
+                <div class="p-leg p-leg-back"></div>
+                <div class="p-torso"></div>
+                <div class="p-head"><div class="p-cap"></div></div>
+                <div class="p-leg p-leg-front"></div>
+                <div class="p-arm p-arm-front"></div>
+                <div class="p-ball-hand"></div>
+              </div>
+            </div>
             <!-- Ball element for delivery animation -->
             <div class="pitch-ball" id="local-pitch-ball" style="display:none"></div>
             
@@ -539,8 +560,29 @@
             <div class="crease right-crease"></div>
             <div class="stumps right-stumps"></div>
             <!-- Wicketkeeper & Bowler Graphic -->
-            <div class="pitch-fielder fielder-keeper" id="tournament-keeper-avatar">🧤</div>
-            <div class="pitch-fielder fielder-bowler" id="tournament-bowler-avatar">🏃</div>
+            <div class="pitch-fielder fielder-keeper" id="tournament-keeper-avatar" aria-label="Wicket keeper">
+              <div class="player-graphic">
+                <div class="p-arm p-arm-back"></div>
+                <div class="p-glove glove-back"></div>
+                <div class="p-leg p-leg-back"></div>
+                <div class="p-torso"></div>
+                <div class="p-head"><div class="p-cap"></div></div>
+                <div class="p-leg p-leg-front"></div>
+                <div class="p-arm p-arm-front"></div>
+                <div class="p-glove glove-front"></div>
+              </div>
+            </div>
+            <div class="pitch-fielder fielder-bowler" id="tournament-bowler-avatar" aria-label="Bowler">
+              <div class="player-graphic">
+                <div class="p-arm p-arm-back"></div>
+                <div class="p-leg p-leg-back"></div>
+                <div class="p-torso"></div>
+                <div class="p-head"><div class="p-cap"></div></div>
+                <div class="p-leg p-leg-front"></div>
+                <div class="p-arm p-arm-front"></div>
+                <div class="p-ball-hand"></div>
+              </div>
+            </div>
             <!-- Ball element for delivery animation -->
             <div class="pitch-ball" id="tournament-pitch-ball" style="display:none"></div>
 
