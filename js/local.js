@@ -506,6 +506,9 @@ const LocalMode = (() => {
     // Current over balls
     updateCurrentOver('local-current-over', team.currentOver);
 
+    // Recent overs
+    updateRecentOvers('local-recent-overs-container', 'local-recent-overs', team.overSummaries);
+
     // Extras
     const extrasEl = el('local-extras');
     if (extrasEl) extrasEl.textContent = matchState.extras || 0;
@@ -545,6 +548,77 @@ const LocalMode = (() => {
       tag.textContent = ball.label;
       container.appendChild(tag);
     });
+  }
+
+  /**
+   * Render recent/previous completed overs
+   */
+  function updateRecentOvers(containerId, listId, overSummaries) {
+    const container = el(containerId);
+    const list = el(listId);
+    if (!container || !list) return;
+
+    const completedOvers = overSummaries || [];
+    if (completedOvers.length === 0) {
+      container.style.display = 'none';
+      return;
+    }
+
+    container.style.display = 'flex';
+    list.innerHTML = '';
+
+    // Show the last 4 completed overs (scrollable if more)
+    const recent = completedOvers.slice(-4);
+    const startIndex = completedOvers.length - recent.length + 1;
+
+    recent.forEach((over, idx) => {
+      const overNum = startIndex + idx;
+      let overRuns = 0;
+      over.forEach(ball => {
+        if (ball.label === 'W') {
+          // Wicket (0 runs in summary unless extras)
+        } else if (ball.label.startsWith('WD')) {
+          const parts = ball.label.split('+');
+          const bonus = parts.length > 1 ? parseInt(parts[1]) : 0;
+          overRuns += 1 + bonus;
+        } else if (ball.label.startsWith('NB')) {
+          const parts = ball.label.split('+');
+          const bonus = parts.length > 1 ? parseInt(parts[1]) : 0;
+          overRuns += 1 + bonus;
+        } else {
+          const r = parseInt(ball.label);
+          if (!isNaN(r)) overRuns += r;
+        }
+      });
+
+      const overBlock = document.createElement('div');
+      overBlock.className = 'recent-over-block';
+
+      const numSpan = document.createElement('span');
+      numSpan.className = 'recent-over-number';
+      numSpan.textContent = `Ov ${overNum}`;
+
+      const ballsDiv = document.createElement('div');
+      ballsDiv.className = 'recent-over-balls';
+      over.forEach(ball => {
+        const span = document.createElement('span');
+        span.className = 'mini-ball ' + (ball.class || '');
+        span.textContent = ball.label;
+        ballsDiv.appendChild(span);
+      });
+
+      const runsSpan = document.createElement('span');
+      runsSpan.className = 'recent-over-runs';
+      runsSpan.textContent = `${overRuns}R`;
+
+      overBlock.appendChild(numSpan);
+      overBlock.appendChild(ballsDiv);
+      overBlock.appendChild(runsSpan);
+
+      list.appendChild(overBlock);
+    });
+
+    list.scrollLeft = list.scrollWidth;
   }
 
   /**

@@ -3526,6 +3526,114 @@ body.theme-basic .history-team-row {
   font-size: 0.68rem;
 }
 
+/* Recent Overs scoreboard styles */
+.recent-overs-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.15);
+  padding-top: 6px;
+  overflow: hidden;
+}
+
+.recent-overs-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  white-space: nowrap;
+}
+
+.recent-overs-list {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  overflow-x: auto;
+  flex: 1;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.recent-overs-list::-webkit-scrollbar {
+  display: none;
+}
+
+.recent-over-block {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 3px 6px;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.recent-over-number {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #00e5ff;
+}
+
+.recent-over-balls {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.recent-overs-list .mini-ball {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0;
+  width: 16px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  font-size: 0.58rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.recent-overs-list .mini-ball.four {
+  background: rgba(16, 185, 129, 0.25);
+  color: #a7f3d0;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.recent-overs-list .mini-ball.six {
+  background: rgba(168, 85, 247, 0.25);
+  color: #e9d5ff;
+  border: 1px solid rgba(168, 85, 247, 0.4);
+}
+
+.recent-overs-list .mini-ball.wicket {
+  background: rgba(239, 68, 68, 0.25);
+  color: #fecaca;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.recent-overs-list .mini-ball.wide,
+.recent-overs-list .mini-ball.noball {
+  background: rgba(250, 204, 21, 0.18);
+  color: #fef08a;
+  border: 1.5px solid rgba(250, 204, 21, 0.3);
+  border-radius: 4px;
+}
+
+.recent-over-runs {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+
 /* For larger/taller screens, we can restore standard sizes in bottom panel */
 @media (min-height: 800px) {
   .match-container.with-pitch .score-runs {
