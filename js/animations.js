@@ -66,6 +66,10 @@ const Animations = (() => {
         p.vy += p.gravity;
         p.alpha -= p.decay;
         
+        // Add slow-motion air resistance drag
+        p.vx *= 0.982;
+        p.vy *= 0.982;
+        
         if (p.alpha <= 0) {
           currentParticles.splice(i, 1);
           continue;
@@ -127,25 +131,26 @@ const Animations = (() => {
 
     for (let i = 0; i < count; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * 8 + (type === 'out' ? 2 : 4);
+      const speed = Math.random() * 5 + (type === 'out' ? 1.5 : 2.5);
       const color = colors[Math.floor(Math.random() * colors.length)];
       
       if (type === 'out' && (color.startsWith('#ef') || color.startsWith('#7f'))) {
-        // Red smoke puff
+        // Red smoke puff (slow decay, slow float)
         currentParticles.push({
           x: x + (Math.random() - 0.5) * 10,
           y: y + (Math.random() - 0.5) * 10,
           vx: Math.cos(angle) * (speed * 0.4),
-          vy: Math.sin(angle) * (speed * 0.4) - 1.5,
+          vy: Math.sin(angle) * (speed * 0.4) - 0.6,
           size: Math.random() * 12 + 6,
           color: color,
           alpha: 0.9,
-          decay: Math.random() * 0.015 + 0.01,
-          gravity: -0.02,
+          decay: Math.random() * 0.005 + 0.003,
+          gravity: -0.008,
           glow: true,
           shape: 'circle'
         });
       } else {
+        // Sparks / Splinters (slow motion gravity and decay)
         currentParticles.push({
           x: x,
           y: y,
@@ -154,8 +159,8 @@ const Animations = (() => {
           size: Math.random() * (type === 'out' ? 5 : 6) + 2,
           color: color,
           alpha: 1.0,
-          decay: Math.random() * 0.02 + 0.01,
-          gravity: type === 'out' ? 0.15 : 0.05,
+          decay: Math.random() * 0.006 + 0.004,
+          gravity: type === 'out' ? 0.05 : 0.015,
           glow: type !== 'out',
           shape: type === 'out' ? 'splinter' : (Math.random() > 0.5 ? 'star' : 'circle'),
           angle: Math.random() * Math.PI
@@ -207,14 +212,16 @@ const Animations = (() => {
         <div class="premium-event-sub">6 runs — Maximum!</div>
       `;
 
+      // Slow Motion: triggers explosion when ball reaches center (1000ms)
       canvasInterval = setTimeout(() => {
         spawnExplosion(canvasInfo.canvas, canvasInfo.width / 2, canvasInfo.height / 2, 70, 'six');
         runParticleSystem(canvasInfo.canvas, canvasInfo.ctx);
-      }, 350);
+      }, 1000);
 
+      // Slow Motion: dismiss after 4.2 seconds
       animTimeout = setTimeout(() => {
         dismiss();
-      }, 2300);
+      }, 4200);
 
     } else if (type === 'four') {
       ct.innerHTML = `
@@ -226,16 +233,17 @@ const Animations = (() => {
         <div class="premium-event-sub">4 Runs — Boundary</div>
       `;
 
+      // Slow Motion: triggers explosion at 1100ms
       canvasInterval = setTimeout(() => {
         const flash = document.getElementById('four-flash');
         if (flash) flash.classList.add('active-boundary-flash');
         spawnExplosion(canvasInfo.canvas, canvasInfo.width / 2, canvasInfo.height / 2, 50, 'four');
         runParticleSystem(canvasInfo.canvas, canvasInfo.ctx);
-      }, 450);
+      }, 1100);
 
       animTimeout = setTimeout(() => {
         dismiss();
-      }, 2300);
+      }, 4200);
 
     } else if (type === 'out') {
       ct.innerHTML = `
@@ -258,6 +266,7 @@ const Animations = (() => {
         <div class="premium-event-sub">Wicket Falls</div>
       `;
 
+      // Slow Motion: triggers collision shatter at 950ms
       canvasInterval = setTimeout(() => {
         const m = document.getElementById('stump-m');
         const mb = document.getElementById('stump-mb');
@@ -277,11 +286,11 @@ const Animations = (() => {
         const impactY = canvasInfo.height / 2 + 10;
         spawnExplosion(canvasInfo.canvas, impactX, impactY, 45, 'out');
         runParticleSystem(canvasInfo.canvas, canvasInfo.ctx);
-      }, 400);
+      }, 950);
 
       animTimeout = setTimeout(() => {
         dismiss();
-      }, 2500);
+      }, 4600);
 
     } else if (type === 'wide') {
       const isLeft = Math.random() < 0.5;
@@ -300,7 +309,7 @@ const Animations = (() => {
 
       animTimeout = setTimeout(() => {
         dismiss();
-      }, 2100);
+      }, 3800);
 
     } else if (type === 'noball') {
       ct.innerHTML = `
@@ -314,7 +323,7 @@ const Animations = (() => {
 
       animTimeout = setTimeout(() => {
         dismiss();
-      }, 2100);
+      }, 3800);
     }
   }
 

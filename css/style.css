@@ -2743,7 +2743,7 @@ body.theme-basic .history-team-row {
 }
 
 .animate-six-ball {
-  animation: sixBallSpin 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards;
+  animation: sixBallSpin 1.6s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards;
 }
 
 @keyframes sixBallSpin {
@@ -2769,7 +2769,7 @@ body.theme-basic .history-team-row {
 }
 
 .animate-four-ball {
-  animation: fourBallBounce 0.9s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+  animation: fourBallBounce 1.8s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
 }
 
 @keyframes fourBallBounce {
@@ -2807,7 +2807,7 @@ body.theme-basic .history-team-row {
 }
 
 .active-boundary-flash {
-  animation: boundaryFlash 0.5s ease-out forwards;
+  animation: boundaryFlash 0.8s ease-out forwards;
 }
 
 @keyframes boundaryFlash {
@@ -2828,7 +2828,7 @@ body.theme-basic .history-team-row {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   filter: drop-shadow(0 0 15px rgba(255, 94, 0, 0.6)) drop-shadow(0 0 30px rgba(168, 85, 247, 0.4));
-  animation: textRevealSix 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.25) 0.7s forwards;
+  animation: textRevealSix 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.15) 1.2s forwards;
   opacity: 0;
   transform: scale(0.5);
   letter-spacing: 2px;
@@ -2849,7 +2849,7 @@ body.theme-basic .history-team-row {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   filter: drop-shadow(0 0 15px rgba(0, 255, 102, 0.6)) drop-shadow(0 0 30px rgba(0, 229, 255, 0.4));
-  animation: textRevealFour 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.25) 0.7s forwards;
+  animation: textRevealFour 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.15) 1.3s forwards;
   opacity: 0;
   transform: scale(0.5);
   letter-spacing: 2px;
@@ -2948,19 +2948,19 @@ body.theme-basic .history-team-row {
 }
 
 .shatter-left-stump {
-  animation: shatterLeftStump 1.2s cubic-bezier(0.1, 0.8, 0.1, 1) forwards;
+  animation: shatterLeftStump 2.2s cubic-bezier(0.1, 0.8, 0.1, 1) forwards;
 }
 .shatter-right-stump {
-  animation: shatterRightStump 1.2s cubic-bezier(0.1, 0.8, 0.1, 1) forwards;
+  animation: shatterRightStump 2.2s cubic-bezier(0.1, 0.8, 0.1, 1) forwards;
 }
 .shatter-middle-top {
-  animation: shatterMiddleTop 1.2s cubic-bezier(0.1, 0.8, 0.1, 1) forwards;
+  animation: shatterMiddleTop 2.2s cubic-bezier(0.1, 0.8, 0.1, 1) forwards;
 }
 .shatter-left-bail {
-  animation: shatterLeftBail 1.4s cubic-bezier(0.1, 0.8, 0.1, 1) forwards;
+  animation: shatterLeftBail 2.5s cubic-bezier(0.1, 0.8, 0.1, 1) forwards;
 }
 .shatter-right-bail {
-  animation: shatterRightBail 1.4s cubic-bezier(0.1, 0.8, 0.1, 1) forwards;
+  animation: shatterRightBail 2.5s cubic-bezier(0.1, 0.8, 0.1, 1) forwards;
 }
 
 @keyframes shatterLeftStump {
@@ -3003,7 +3003,7 @@ body.theme-basic .history-team-row {
 }
 
 .animate-out-ball {
-  animation: outBallFly 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: outBallFly 1.0s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 @keyframes outBallFly {
@@ -3036,7 +3036,7 @@ body.theme-basic .history-team-row {
 }
 
 .animate-wicket-flash {
-  animation: wicketFlash 0.3s ease-out forwards;
+  animation: wicketFlash 0.7s ease-out forwards;
 }
 
 @keyframes wicketFlash {
@@ -3051,7 +3051,7 @@ body.theme-basic .history-team-row {
   text-transform: uppercase;
   color: #ef4444;
   text-shadow: 0 0 20px #ef4444, 0 0 45px #7f1d1d;
-  animation: textRevealOut 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.25) 0.45s forwards;
+  animation: textRevealOut 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.25) 0.9s forwards;
   opacity: 0;
   transform: scale(0.3);
   letter-spacing: 4px;
@@ -3070,7 +3070,7 @@ body.theme-basic .history-team-row {
   text-transform: uppercase;
   color: #facc15;
   text-shadow: 0 0 10px #facc15, 0 0 30px #ca8a04;
-  animation: wideTextIn 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards;
+  animation: wideTextIn 1.4s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards;
   letter-spacing: 3px;
 }
 
@@ -3086,7 +3086,7 @@ body.theme-basic .history-team-row {
   text-transform: uppercase;
   color: #f97316;
   text-shadow: 0 0 10px #f97316, 0 0 30px #c2410c;
-  animation: noballTextIn 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards;
+  animation: noballTextIn 1.4s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards;
   letter-spacing: 2px;
 }
 
@@ -3139,11 +3139,11 @@ body.theme-basic .history-team-row {
 }
 
 .animate-wide-path-left {
-  animation: widePathLeft 0.75s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: widePathLeft 1.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 .animate-wide-path-right {
-  animation: widePathRight 0.75s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: widePathRight 1.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 @keyframes widePathLeft {
@@ -3172,7 +3172,7 @@ body.theme-basic .history-team-row {
 }
 
 .animate-noball-foot {
-  animation: noballFootStep 0.6s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
+  animation: noballFootStep 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
 }
 
 @keyframes noballFootStep {
@@ -3206,7 +3206,7 @@ body.theme-basic .history-team-row {
   letter-spacing: 4px;
   margin-top: 20px;
   opacity: 0;
-  animation: premiumSubFade 0.8s ease forwards 0.7s;
+  animation: premiumSubFade 1.5s ease forwards 1.2s;
   text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
