@@ -153,6 +153,7 @@ const TournamentMode = (() => {
 
     isAuthenticated = true; // Auto-authenticate the host creator
     updateAuthBanner();
+    AI.setLastSpokenText('');
     updateScoreboard();
     renderPlayerList();
     
@@ -218,6 +219,7 @@ const TournamentMode = (() => {
     matchState = data;
     isAuthenticated = false;
     updateAuthBanner();
+    AI.setLastSpokenText(data ? data.aiCommentary : '');
     updateScoreboard();
     renderPlayerList();
     
@@ -320,6 +322,10 @@ const TournamentMode = (() => {
         matchState.lastEvent = { type: animType, timestamp: Date.now() };
       }
       FirebaseSync.syncState(matchState);
+
+      if (action !== 'undo') {
+        AI.generateCommentary(matchState, 'tournament');
+      }
 
       if (matchState.isMatchOver && !matchState.historySaved) {
         matchState.historySaved = true;
@@ -435,6 +441,26 @@ const TournamentMode = (() => {
     // Show/hide extra run button (only for authenticated scorer)
     const extraRunBtn = el('tournament-extra-run-btn');
     if (extraRunBtn) extraRunBtn.style.display = isAuthenticated ? 'block' : 'none';
+
+    // Update AI Commentary display
+    const aiCommentarySection = el('tournament-ai-commentary-section');
+    const aiCommentaryText = el('tournament-ai-commentary-text');
+    if (aiCommentarySection && aiCommentaryText) {
+      if (matchState.aiCommentary) {
+        aiCommentarySection.style.display = 'block';
+        aiCommentaryText.textContent = matchState.aiCommentary;
+        const isUndo = matchState.lastEvent && matchState.lastEvent.type === 'undo';
+        AI.speakIfEnabled(matchState.aiCommentary, isUndo);
+      } else {
+        const battingTeam = CricketEngine.getBattingTeam(matchState);
+        if (battingTeam.ballHistory && battingTeam.ballHistory.length > 0) {
+          aiCommentarySection.style.display = 'block';
+          aiCommentaryText.textContent = "Waiting for the next ball...";
+        } else {
+          aiCommentarySection.style.display = 'none';
+        }
+      }
+    }
 
     // Draw/update stats charts
     App.updateCharts(matchState, 'tournament');

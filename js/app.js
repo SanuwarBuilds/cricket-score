@@ -850,6 +850,11 @@ const App = (() => {
       }
     });
 
+    // Initialize AI commentary module
+    if (typeof AI !== 'undefined') {
+      AI.init();
+    }
+
     // Start on home
     navigate('home');
   }

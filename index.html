@@ -484,6 +484,15 @@
               </div>
             </div>
 
+            <!-- AI Live Commentary Box -->
+            <div class="ai-commentary-section" id="local-ai-commentary-section" style="display: none;">
+              <div class="ai-commentary-header">
+                <span>🎙️ AI LIVE COMMENTARY</span>
+                <button class="ai-speak-btn" id="local-ai-speak-btn" title="Toggle Sound">🔊</button>
+              </div>
+              <div class="ai-commentary-text" id="local-ai-commentary-text">Waiting for the next ball...</div>
+            </div>
+
             <div class="last-over-section">
               <span class="last-over-label">This Over:</span>
               <div class="last-over-balls" id="local-current-over"></div>
@@ -714,6 +723,15 @@
                 <span class="stat-label">Extras</span>
                 <span class="stat-value" id="tournament-extras">0</span>
               </div>
+            </div>
+
+            <!-- AI Live Commentary Box -->
+            <div class="ai-commentary-section" id="tournament-ai-commentary-section" style="display: none;">
+              <div class="ai-commentary-header">
+                <span>🎙️ AI LIVE COMMENTARY</span>
+                <button class="ai-speak-btn" id="tournament-ai-speak-btn" title="Toggle Sound">🔊</button>
+              </div>
+              <div class="ai-commentary-text" id="tournament-ai-commentary-text">Waiting for the next ball...</div>
             </div>
 
             <div class="last-over-section">
@@ -952,11 +970,12 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- App Scripts -->
-  <script src="js/firebase.js?v=14"></script>
-  <script src="js/cricket.js?v=14"></script>
-  <script src="js/animations.js?v=14"></script>
-  <script src="js/local.js?v=14"></script>
-  <script src="js/tournament.js?v=14"></script>
-  <script src="js/app.js?v=14"></script>
+  <script src="js/firebase.js"></script>
+  <script src="js/cricket.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/local.js"></script>
+  <script src="js/tournament.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
