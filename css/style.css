@@ -3605,10 +3605,10 @@ body.theme-basic .history-team-row {
 }
 
 .pitch-container {
-  flex: 0 0 28%;
+  flex: 0 0 20%;
   position: relative;
   width: 90%;
-  max-width: 520px;
+  max-width: 480px;
   margin: 12px auto 0;
   background:
     radial-gradient(circle at 12% 0%, rgba(255, 255, 255, 0.2), transparent 35%),
@@ -5795,7 +5795,8 @@ body.theme-basic .winner-msg-banner {
   border-radius: var(--radius-sm);
   padding: 8px 12px;
   margin: 12px auto 0;
-  max-width: 260px; /* Slimmer centered width */
+  width: 90%;
+  max-width: 480px;
   text-align: center;
 }
 
