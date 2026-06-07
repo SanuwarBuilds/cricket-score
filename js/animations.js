@@ -6,38 +6,316 @@ const Animations = (() => {
   const overlay = () => document.getElementById('animation-overlay');
   const content = () => document.getElementById('animation-content');
 
-  const events = {
-    four:   { text: 'FOUR!',    sub: '4 runs',          cssClass: 'four-text' },
-    six:    { text: 'SIX!',     sub: '6 runs — Maximum!', cssClass: 'six-text' },
-    out:    { text: 'OUT!',     sub: 'Wicket falls',     cssClass: 'out-text' },
-    wide:   { text: 'WIDE',     sub: '+1 run',           cssClass: 'wide-text' },
-    noball: { text: 'NO BALL',  sub: '+1 run',           cssClass: 'noball-text' }
-  };
-
   let animTimeout = null;
-  let fireworkRAF  = null;
+  let fireworkRAF = null;
+  let canvasInterval = null;
+  let particleLoopId = null;
+  let currentParticles = [];
 
-  /* ───────────────────────────────────────────────
-     Ball / Delivery Event Animation (unchanged API)
-  ─────────────────────────────────────────────── */
+  // Setup click to dismiss instantly
+  document.addEventListener('DOMContentLoaded', () => {
+    const ol = overlay();
+    if (ol) {
+      ol.style.pointerEvents = 'auto'; // allow clicks
+      ol.addEventListener('click', () => {
+        dismiss();
+      });
+    }
+  });
+
+  /**
+   * Dismiss current animation
+   */
+  function dismiss() {
+    const ol = overlay();
+    const ct = content();
+    if (ol) {
+      ol.classList.remove('active');
+    }
+    if (ct) {
+      ct.innerHTML = '';
+    }
+    
+    // Clear timeouts
+    if (animTimeout) {
+      clearTimeout(animTimeout);
+      animTimeout = null;
+    }
+    if (canvasInterval) {
+      clearTimeout(canvasInterval);
+      canvasInterval = null;
+    }
+    if (particleLoopId) {
+      cancelAnimationFrame(particleLoopId);
+      particleLoopId = null;
+    }
+    currentParticles = [];
+  }
+
+  /**
+   * Run particle system loop on Canvas
+   */
+  function runParticleSystem(canvas, ctx) {
+    function tick() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      for (let i = currentParticles.length - 1; i >= 0; i--) {
+        const p = currentParticles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += p.gravity;
+        p.alpha -= p.decay;
+        
+        if (p.alpha <= 0) {
+          currentParticles.splice(i, 1);
+          continue;
+        }
+        
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        
+        // Draw glow effect for particles
+        if (p.glow) {
+          ctx.shadowBlur = p.size * 1.5;
+          ctx.shadowColor = p.color;
+        }
+
+        ctx.fillStyle = p.color;
+        
+        if (p.shape === 'star') {
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y - p.size);
+          ctx.lineTo(p.x + p.size/3, p.y - p.size/3);
+          ctx.lineTo(p.x + p.size, p.y);
+          ctx.lineTo(p.x + p.size/3, p.y + p.size/3);
+          ctx.lineTo(p.x, p.y + p.size);
+          ctx.lineTo(p.x - p.size/3, p.y + p.size/3);
+          ctx.lineTo(p.x - p.size, p.y);
+          ctx.lineTo(p.x - p.size/3, p.y - p.size/3);
+          ctx.closePath();
+          ctx.fill();
+        } else if (p.shape === 'splinter') {
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.angle);
+          ctx.fillRect(-p.size, -p.size/3, p.size * 2, p.size * 0.6);
+        } else {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        
+        ctx.restore();
+      }
+      
+      if (currentParticles.length > 0) {
+        particleLoopId = requestAnimationFrame(tick);
+      }
+    }
+    
+    tick();
+  }
+
+  /**
+   * Spawn explosion particles
+   */
+  function spawnExplosion(canvas, x, y, count, type) {
+    const colors = {
+      six: ['#ffe600', '#ff5e00', '#ff0077', '#a855f7', '#00e5ff'],
+      four: ['#00ff66', '#22c55e', '#00e5ff', '#a855f7'],
+      out: ['#e0a96d', '#b88b5c', '#916d48', '#ef4444', '#7f1d1d'],
+    }[type] || ['#fff'];
+
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 8 + (type === 'out' ? 2 : 4);
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      
+      if (type === 'out' && (color.startsWith('#ef') || color.startsWith('#7f'))) {
+        // Red smoke puff
+        currentParticles.push({
+          x: x + (Math.random() - 0.5) * 10,
+          y: y + (Math.random() - 0.5) * 10,
+          vx: Math.cos(angle) * (speed * 0.4),
+          vy: Math.sin(angle) * (speed * 0.4) - 1.5,
+          size: Math.random() * 12 + 6,
+          color: color,
+          alpha: 0.9,
+          decay: Math.random() * 0.015 + 0.01,
+          gravity: -0.02,
+          glow: true,
+          shape: 'circle'
+        });
+      } else {
+        currentParticles.push({
+          x: x,
+          y: y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          size: Math.random() * (type === 'out' ? 5 : 6) + 2,
+          color: color,
+          alpha: 1.0,
+          decay: Math.random() * 0.02 + 0.01,
+          gravity: type === 'out' ? 0.15 : 0.05,
+          glow: type !== 'out',
+          shape: type === 'out' ? 'splinter' : (Math.random() > 0.5 ? 'star' : 'circle'),
+          angle: Math.random() * Math.PI
+        });
+      }
+    }
+  }
+
+  /**
+   * Helper to set up animation canvas sizing
+   */
+  function setupCanvas(ol) {
+    const canvas = document.createElement('canvas');
+    canvas.className = 'animation-canvas';
+    ol.appendChild(canvas);
+    
+    const dpr = window.devicePixelRatio || 1;
+    const rect = ol.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    
+    return { canvas, ctx, width: rect.width, height: rect.height };
+  }
+
+  /**
+   * Show premium event animation
+   */
   function show(type) {
-    const cfg = events[type];
-    if (!cfg) return;
+    dismiss();
+
     const ol = overlay();
     const ct = content();
     if (!ol || !ct) return;
-    if (animTimeout) { clearTimeout(animTimeout); animTimeout = null; }
-    ol.classList.remove('active');
+
     void ol.offsetWidth;
-    ct.innerHTML = `
-      <div class="event-text ${cfg.cssClass}">${cfg.text}</div>
-      <div class="event-sub">${cfg.sub}</div>
-    `;
     ol.classList.add('active');
-    animTimeout = setTimeout(() => {
-      ol.classList.remove('active');
-      animTimeout = null;
-    }, 1100);
+
+    const canvasInfo = setupCanvas(ol);
+
+    if (type === 'six') {
+      ct.innerHTML = `
+        <div class="premium-ball-wrapper animate-six-ball">
+          <div class="premium-ball"></div>
+        </div>
+        <div class="fairy-six-text">SIX!</div>
+        <div class="premium-event-sub">6 runs — Maximum!</div>
+      `;
+
+      canvasInterval = setTimeout(() => {
+        spawnExplosion(canvasInfo.canvas, canvasInfo.width / 2, canvasInfo.height / 2, 70, 'six');
+        runParticleSystem(canvasInfo.canvas, canvasInfo.ctx);
+      }, 350);
+
+      animTimeout = setTimeout(() => {
+        dismiss();
+      }, 2300);
+
+    } else if (type === 'four') {
+      ct.innerHTML = `
+        <div class="boundary-flash" id="four-flash"></div>
+        <div class="premium-ball-wrapper animate-four-ball">
+          <div class="premium-ball"></div>
+        </div>
+        <div class="fairy-four-text">FOUR!</div>
+        <div class="premium-event-sub">4 Runs — Boundary</div>
+      `;
+
+      canvasInterval = setTimeout(() => {
+        const flash = document.getElementById('four-flash');
+        if (flash) flash.classList.add('active-boundary-flash');
+        spawnExplosion(canvasInfo.canvas, canvasInfo.width / 2, canvasInfo.height / 2, 50, 'four');
+        runParticleSystem(canvasInfo.canvas, canvasInfo.ctx);
+      }, 450);
+
+      animTimeout = setTimeout(() => {
+        dismiss();
+      }, 2300);
+
+    } else if (type === 'out') {
+      ct.innerHTML = `
+        <div class="wicket-wrapper">
+          <div class="stump-container">
+            <div class="stump left" id="stump-l"></div>
+            <div class="stump middle" id="stump-m"></div>
+            <div class="stump middle-bottom" id="stump-mb"></div>
+            <div class="stump middle-top" id="stump-mt"></div>
+            <div class="stump right" id="stump-r"></div>
+            <div class="bail-container">
+              <div class="bail left-bail" id="bail-l"></div>
+              <div class="bail right-bail" id="bail-r"></div>
+            </div>
+          </div>
+          <div class="out-ball animate-out-ball"></div>
+          <div class="wicket-impact-flash" id="wicket-flash"></div>
+        </div>
+        <div class="shattered-out-text">OUT!</div>
+        <div class="premium-event-sub">Wicket Falls</div>
+      `;
+
+      canvasInterval = setTimeout(() => {
+        const m = document.getElementById('stump-m');
+        const mb = document.getElementById('stump-mb');
+        const mt = document.getElementById('stump-mt');
+        if (m) m.style.display = 'none';
+        if (mb) mb.style.display = 'block';
+        if (mt) mt.style.display = 'block';
+
+        document.getElementById('stump-l')?.classList.add('shatter-left-stump');
+        document.getElementById('stump-r')?.classList.add('shatter-right-stump');
+        document.getElementById('stump-mt')?.classList.add('shatter-middle-top');
+        document.getElementById('bail-l')?.classList.add('shatter-left-bail');
+        document.getElementById('bail-r')?.classList.add('shatter-right-bail');
+        document.getElementById('wicket-flash')?.classList.add('animate-wicket-flash');
+
+        const impactX = canvasInfo.width / 2;
+        const impactY = canvasInfo.height / 2 + 10;
+        spawnExplosion(canvasInfo.canvas, impactX, impactY, 45, 'out');
+        runParticleSystem(canvasInfo.canvas, canvasInfo.ctx);
+      }, 400);
+
+      animTimeout = setTimeout(() => {
+        dismiss();
+      }, 2500);
+
+    } else if (type === 'wide') {
+      const isLeft = Math.random() < 0.5;
+      const pathClass = isLeft ? 'animate-wide-path-left' : 'animate-wide-path-right';
+
+      ct.innerHTML = `
+        <div class="crease-wireframe">
+          <div class="crease-danger-line"></div>
+          <div class="crease-wide-line-left" style="${isLeft ? 'background: #facc15; box-shadow: 0 0 15px #facc15;' : ''}"></div>
+          <div class="crease-wide-line-right" style="${!isLeft ? 'background: #facc15; box-shadow: 0 0 15px #facc15;' : ''}"></div>
+          <div class="wide-ball-path ${pathClass}"></div>
+        </div>
+        <div class="neon-wide-text">WIDE</div>
+        <div class="premium-event-sub">+1 Extra Run</div>
+      `;
+
+      animTimeout = setTimeout(() => {
+        dismiss();
+      }, 2100);
+
+    } else if (type === 'noball') {
+      ct.innerHTML = `
+        <div class="crease-wireframe">
+          <div class="crease-danger-line active"></div>
+          <div class="noball-foot animate-noball-foot"></div>
+        </div>
+        <div class="neon-noball-text">NO BALL</div>
+        <div class="premium-event-sub">Crease Crossed — +1 Run</div>
+      `;
+
+      animTimeout = setTimeout(() => {
+        dismiss();
+      }, 2100);
+    }
   }
 
   /* ───────────────────────────────────────────────
