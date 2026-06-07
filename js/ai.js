@@ -43,6 +43,18 @@ const AI = (() => {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.getVoices();
     }
+
+    // Unmute/unlock speech engine on first user tap/click
+    const unlockSpeech = () => {
+      if ('speechSynthesis' in window) {
+        const u = new SpeechSynthesisUtterance('');
+        window.speechSynthesis.speak(u);
+      }
+      document.removeEventListener('click', unlockSpeech);
+      document.removeEventListener('touchstart', unlockSpeech);
+    };
+    document.addEventListener('click', unlockSpeech);
+    document.addEventListener('touchstart', unlockSpeech);
   }
 
   function updateSpeakButtonUI(btn) {
