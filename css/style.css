@@ -5791,7 +5791,7 @@ body.theme-basic .winner-msg-banner {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   padding: 12px;
-  margin-top: 12px;
+  margin: 12px var(--container-padding) 0;
   text-align: center;
 }
 

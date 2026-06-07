@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=15">
+  <link rel="stylesheet" href="css/style.css?v=16">
 </head>
 <body class="theme-basic">
 
@@ -413,6 +413,19 @@
         <div class="pitch-event-overlay" id="local-pitch-event"></div>
       </div>
 
+      <!-- Live Win Probability Predictor -->
+      <div class="win-probability-section" id="local-win-prob-section" style="display: none;">
+        <div class="win-prob-header">📊 LIVE WIN PROBABILITY</div>
+        <div class="win-prob-bar-container">
+          <div class="win-prob-bar team-a-bar" id="local-win-prob-a" style="width: 50%;">
+            <span class="win-prob-label" id="local-win-prob-a-text">TEAM A: 50%</span>
+          </div>
+          <div class="win-prob-bar team-b-bar" id="local-win-prob-b" style="width: 50%;">
+            <span class="win-prob-label" id="local-win-prob-b-text">50% :TEAM B</span>
+          </div>
+        </div>
+      </div>
+
       <!-- Bottom Panel -->
       <div class="match-bottom-panel">
         <!-- Auth Button (small corner) -->
@@ -484,18 +497,7 @@
               </div>
             </div>
 
-            <!-- Live Win Probability Predictor -->
-            <div class="win-probability-section" id="local-win-prob-section" style="display: none;">
-              <div class="win-prob-header">📊 LIVE WIN PROBABILITY</div>
-              <div class="win-prob-bar-container">
-                <div class="win-prob-bar team-a-bar" id="local-win-prob-a" style="width: 50%;">
-                  <span class="win-prob-label" id="local-win-prob-a-text">TEAM A: 50%</span>
-                </div>
-                <div class="win-prob-bar team-b-bar" id="local-win-prob-b" style="width: 50%;">
-                  <span class="win-prob-label" id="local-win-prob-b-text">50% :TEAM B</span>
-                </div>
-              </div>
-            </div>
+
 
 
 
@@ -652,6 +654,19 @@
         <div class="pitch-event-overlay" id="tournament-pitch-event"></div>
       </div>
 
+      <!-- Live Win Probability Predictor -->
+      <div class="win-probability-section" id="tournament-win-prob-section" style="display: none;">
+        <div class="win-prob-header">📊 LIVE WIN PROBABILITY</div>
+        <div class="win-prob-bar-container">
+          <div class="win-prob-bar team-a-bar" id="tournament-win-prob-a" style="width: 50%;">
+            <span class="win-prob-label" id="tournament-win-prob-a-text">TEAM A: 50%</span>
+          </div>
+          <div class="win-prob-bar team-b-bar" id="tournament-win-prob-b" style="width: 50%;">
+            <span class="win-prob-label" id="tournament-win-prob-b-text">50% :TEAM B</span>
+          </div>
+        </div>
+      </div>
+
       <!-- Bottom Panel -->
       <div class="match-bottom-panel">
         <!-- Auth Button (small corner) -->
@@ -731,18 +746,7 @@
               </div>
             </div>
 
-            <!-- Live Win Probability Predictor -->
-            <div class="win-probability-section" id="tournament-win-prob-section" style="display: none;">
-              <div class="win-prob-header">📊 LIVE WIN PROBABILITY</div>
-              <div class="win-prob-bar-container">
-                <div class="win-prob-bar team-a-bar" id="tournament-win-prob-a" style="width: 50%;">
-                  <span class="win-prob-label" id="tournament-win-prob-a-text">TEAM A: 50%</span>
-                </div>
-                <div class="win-prob-bar team-b-bar" id="tournament-win-prob-b" style="width: 50%;">
-                  <span class="win-prob-label" id="tournament-win-prob-b-text">50% :TEAM B</span>
-                </div>
-              </div>
-            </div>
+
 
 
 
@@ -982,12 +986,12 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- App Scripts -->
-  <script src="js/firebase.js?v=15"></script>
-  <script src="js/cricket.js?v=15"></script>
-  <script src="js/animations.js?v=15"></script>
+  <script src="js/firebase.js?v=16"></script>
+  <script src="js/cricket.js?v=16"></script>
+  <script src="js/animations.js?v=16"></script>
 
-  <script src="js/local.js?v=15"></script>
-  <script src="js/tournament.js?v=15"></script>
-  <script src="js/app.js?v=15"></script>
+  <script src="js/local.js?v=16"></script>
+  <script src="js/tournament.js?v=16"></script>
+  <script src="js/app.js?v=16"></script>
 </body>
 </html>
