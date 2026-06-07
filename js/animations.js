@@ -212,16 +212,15 @@ const Animations = (() => {
         <div class="premium-event-sub">6 runs — Maximum!</div>
       `;
 
-      // Slow Motion: triggers explosion when ball reaches center (1000ms)
+      // Trigger explosion when ball reaches center.
       canvasInterval = setTimeout(() => {
         spawnExplosion(canvasInfo.canvas, canvasInfo.width / 2, canvasInfo.height / 2, 70, 'six');
         runParticleSystem(canvasInfo.canvas, canvasInfo.ctx);
-      }, 1000);
+      }, 650);
 
-      // Slow Motion: dismiss after 4.2 seconds
       animTimeout = setTimeout(() => {
         dismiss();
-      }, 4200);
+      }, 2700);
 
     } else if (type === 'four') {
       ct.innerHTML = `
@@ -233,17 +232,16 @@ const Animations = (() => {
         <div class="premium-event-sub">4 Runs — Boundary</div>
       `;
 
-      // Slow Motion: triggers explosion at 1100ms
       canvasInterval = setTimeout(() => {
         const flash = document.getElementById('four-flash');
         if (flash) flash.classList.add('active-boundary-flash');
         spawnExplosion(canvasInfo.canvas, canvasInfo.width / 2, canvasInfo.height / 2, 50, 'four');
         runParticleSystem(canvasInfo.canvas, canvasInfo.ctx);
-      }, 1100);
+      }, 680);
 
       animTimeout = setTimeout(() => {
         dismiss();
-      }, 4200);
+      }, 2700);
 
     } else if (type === 'out') {
       ct.innerHTML = `
@@ -266,7 +264,7 @@ const Animations = (() => {
         <div class="premium-event-sub">Wicket Falls</div>
       `;
 
-      // Slow Motion: triggers collision shatter at 950ms
+      // Trigger collision shatter as the ball reaches the stumps.
       canvasInterval = setTimeout(() => {
         const m = document.getElementById('stump-m');
         const mb = document.getElementById('stump-mb');
@@ -286,11 +284,11 @@ const Animations = (() => {
         const impactY = canvasInfo.height / 2 + 10;
         spawnExplosion(canvasInfo.canvas, impactX, impactY, 45, 'out');
         runParticleSystem(canvasInfo.canvas, canvasInfo.ctx);
-      }, 950);
+      }, 620);
 
       animTimeout = setTimeout(() => {
         dismiss();
-      }, 4600);
+      }, 2900);
 
     } else if (type === 'wide') {
       const isLeft = Math.random() < 0.5;
@@ -309,7 +307,7 @@ const Animations = (() => {
 
       animTimeout = setTimeout(() => {
         dismiss();
-      }, 3800);
+      }, 2400);
 
     } else if (type === 'noball') {
       ct.innerHTML = `
@@ -323,7 +321,7 @@ const Animations = (() => {
 
       animTimeout = setTimeout(() => {
         dismiss();
-      }, 3800);
+      }, 2400);
     }
   }
 

@@ -401,38 +401,52 @@ const CricketEngine = (() => {
       return { teamA: 50, teamB: 50 };
     }
 
+    const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+    const getParRate = (overs) => {
+      if (overs <= 5) return 8.5;
+      if (overs <= 10) return 8.0;
+      return 7.5;
+    };
+
     const innings = state.currentInnings;
     const battingIdx = innings; // index of team currently batting (0 or 1)
 
     const battingTeam = state.teams[battingIdx];
-    const maxWickets = state.maxWickets;
-    const totalOvers = state.totalOvers;
+    const maxWickets = Math.max(1, state.maxWickets || 1);
+    const totalOvers = Math.max(1, state.totalOvers || 1);
+    const totalBalls = totalOvers * 6;
+    const parRate = getParRate(totalOvers);
+    const parScore = parRate * totalOvers;
 
     // Standard baseline
     let battingProb = 50;
 
     if (innings === 0) {
-      // 1st Innings: Predict based on Run Rate & Wickets
+      // 1st innings: estimate projected score against a format-aware par score.
       const ballsBowled = battingTeam.balls;
       if (ballsBowled === 0) {
         return { teamA: 50, teamB: 50 };
       }
 
-      const crr = (battingTeam.runs / ballsBowled) * 6;
-      const progress = ballsBowled / (totalOvers * 6);
+      const progress = clamp(ballsBowled / totalBalls, 0, 1);
       const wicketsFallen = battingTeam.wickets;
+      const wicketRatio = clamp(wicketsFallen / maxWickets, 0, 1);
 
-      // Good RPO is around 7.5 for baseline 50%
-      // Each run rate point above 7.5 increases probability by 5% * progress
-      // Each wicket decreases probability by 5% * progress
-      battingProb = 50 + (crr - 7.5) * 5 * progress - (wicketsFallen / maxWickets) * 25 * progress;
+      // Early balls are noisy, so project the rest of the innings at par rate.
+      const ballsRemaining = Math.max(0, totalBalls - ballsBowled);
+      const projectedScore = battingTeam.runs + (parRate * ballsRemaining / 6);
+      const wicketPenaltyRuns = wicketRatio * parScore * (0.16 + progress * 0.28);
+      const scoreAdvantage = projectedScore - wicketPenaltyRuns - parScore;
+      const runImpact = 45 / Math.max(18, parScore);
+
+      battingProb = 50 + scoreAdvantage * runImpact;
     } else {
-      // 2nd Innings: Predict based on chase difficulty
+      // 2nd innings: compare required rate with par and increase pressure near the end.
       const target = state.target;
       if (target === null) return { teamA: 50, teamB: 50 };
 
       const runsNeeded = Math.max(0, target - battingTeam.runs);
-      const ballsRemaining = Math.max(0, (totalOvers * 6) - battingTeam.balls);
+      const ballsRemaining = Math.max(0, totalBalls - battingTeam.balls);
       const wicketsRemaining = Math.max(0, maxWickets - battingTeam.wickets);
 
       if (runsNeeded === 0) {
@@ -441,20 +455,13 @@ const CricketEngine = (() => {
         battingProb = 0;
       } else {
         const rrr = (runsNeeded / ballsRemaining) * 6;
-        
-        // Wickets remaining factor (0 to 35)
-        const wicketsFactor = (wicketsRemaining / maxWickets) * 35;
-        // RRR factor: baseline is 7.5. If rrr is 7.5, factor is 0. If rrr increases, decrease probability.
-        const rrrFactor = (7.5 - rrr) * 8;
+        const progress = clamp(1 - (ballsRemaining / totalBalls), 0, 1);
+        const lostWicketRatio = clamp(battingTeam.wickets / maxWickets, 0, 1);
+        const ratePressure = (parRate - rrr) / parRate;
+        const pressureMultiplier = 42 * (1 + progress * 1.15);
+        const wicketPenalty = lostWicketRatio * 34 * (0.45 + progress * 0.75);
 
-        battingProb = 50 + wicketsFactor + rrrFactor;
-        
-        // Apply scaling at the end of the match
-        if (ballsRemaining < 12) {
-          // If very few balls remaining, RRR is much more critical
-          const rrrPenalty = Math.max(0, rrr - 8.0) * 15;
-          battingProb -= rrrPenalty;
-        }
+        battingProb = 50 + ratePressure * pressureMultiplier - wicketPenalty;
       }
     }
 
