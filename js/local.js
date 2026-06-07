@@ -277,17 +277,14 @@ const LocalMode = (() => {
       case '1':
         CricketEngine.addRuns(matchState, 1);
         Animations.playPitchAnimation(1, 'local');
-        animType = 'run1';
         break;
       case '2':
         CricketEngine.addRuns(matchState, 2);
         Animations.playPitchAnimation(2, 'local');
-        animType = 'run2';
         break;
       case '3':
         CricketEngine.addRuns(matchState, 3);
         Animations.playPitchAnimation(3, 'local');
-        animType = 'run3';
         break;
       case '4':
         CricketEngine.addRuns(matchState, 4);
@@ -523,6 +520,37 @@ const LocalMode = (() => {
     // Show/hide extra run button (only for authenticated scorer)
     const extraRunBtn = el('local-extra-run-btn');
     if (extraRunBtn) extraRunBtn.style.display = isAuthenticated ? 'block' : 'none';
+
+    // Update Win Probability Predictor
+    const winProbSection = el('local-win-prob-section');
+    const winProbA = el('local-win-prob-a');
+    const winProbB = el('local-win-prob-b');
+    const winProbAText = el('local-win-prob-a-text');
+    const winProbBText = el('local-win-prob-b-text');
+
+    if (winProbSection && winProbA && winProbB && winProbAText && winProbBText) {
+      const totalBallsBowled = matchState.teams[0].balls + matchState.teams[1].balls;
+      if (totalBallsBowled > 0) {
+        winProbSection.style.display = 'block';
+        const probs = CricketEngine.getWinProbability(matchState);
+
+        const colorA = matchState.teams[0].color || '#3b82f6';
+        const colorB = matchState.teams[1].color || '#ef4444';
+        winProbSection.style.setProperty('--team-a-color', colorA);
+        winProbSection.style.setProperty('--team-b-color', colorB);
+
+        winProbA.style.width = `${probs.teamA}%`;
+        winProbB.style.width = `${probs.teamB}%`;
+
+        winProbAText.textContent = `${matchState.teams[0].name}: ${probs.teamA}%`;
+        winProbBText.textContent = `${probs.teamB}% :${matchState.teams[1].name}`;
+
+        winProbAText.style.visibility = probs.teamA < 12 ? 'hidden' : 'visible';
+        winProbBText.style.visibility = probs.teamB < 12 ? 'hidden' : 'visible';
+      } else {
+        winProbSection.style.display = 'none';
+      }
+    }
 
     // Update AI Commentary display
     const aiCommentarySection = el('local-ai-commentary-section');

@@ -383,6 +383,95 @@ const CricketEngine = (() => {
     return `${fullOvers}.${extraBalls}`;
   }
 
+  /**
+   * Calculate Win Probability
+   * Returns { teamA: number, teamB: number } (percentages)
+   */
+  function getWinProbability(state) {
+    if (!state || !state.teams) return { teamA: 50, teamB: 50 };
+
+    // If match is over
+    if (state.isMatchOver) {
+      if (state.winner === 'teamA' || (state.winMessage && state.winMessage.includes(state.teams[0].name))) {
+        return { teamA: 100, teamB: 0 };
+      }
+      if (state.winner === 'teamB' || (state.winMessage && state.winMessage.includes(state.teams[1].name))) {
+        return { teamA: 0, teamB: 100 };
+      }
+      return { teamA: 50, teamB: 50 };
+    }
+
+    const innings = state.currentInnings;
+    const battingIdx = innings; // index of team currently batting (0 or 1)
+
+    const battingTeam = state.teams[battingIdx];
+    const maxWickets = state.maxWickets;
+    const totalOvers = state.totalOvers;
+
+    // Standard baseline
+    let battingProb = 50;
+
+    if (innings === 0) {
+      // 1st Innings: Predict based on Run Rate & Wickets
+      const ballsBowled = battingTeam.balls;
+      if (ballsBowled === 0) {
+        return { teamA: 50, teamB: 50 };
+      }
+
+      const crr = (battingTeam.runs / ballsBowled) * 6;
+      const progress = ballsBowled / (totalOvers * 6);
+      const wicketsFallen = battingTeam.wickets;
+
+      // Good RPO is around 7.5 for baseline 50%
+      // Each run rate point above 7.5 increases probability by 5% * progress
+      // Each wicket decreases probability by 5% * progress
+      battingProb = 50 + (crr - 7.5) * 5 * progress - (wicketsFallen / maxWickets) * 25 * progress;
+    } else {
+      // 2nd Innings: Predict based on chase difficulty
+      const target = state.target;
+      if (target === null) return { teamA: 50, teamB: 50 };
+
+      const runsNeeded = Math.max(0, target - battingTeam.runs);
+      const ballsRemaining = Math.max(0, (totalOvers * 6) - battingTeam.balls);
+      const wicketsRemaining = Math.max(0, maxWickets - battingTeam.wickets);
+
+      if (runsNeeded === 0) {
+        battingProb = 100;
+      } else if (ballsRemaining === 0 || wicketsRemaining === 0) {
+        battingProb = 0;
+      } else {
+        const rrr = (runsNeeded / ballsRemaining) * 6;
+        
+        // Wickets remaining factor (0 to 35)
+        const wicketsFactor = (wicketsRemaining / maxWickets) * 35;
+        // RRR factor: baseline is 7.5. If rrr is 7.5, factor is 0. If rrr increases, decrease probability.
+        const rrrFactor = (7.5 - rrr) * 8;
+
+        battingProb = 50 + wicketsFactor + rrrFactor;
+        
+        // Apply scaling at the end of the match
+        if (ballsRemaining < 12) {
+          // If very few balls remaining, RRR is much more critical
+          const rrrPenalty = Math.max(0, rrr - 8.0) * 15;
+          battingProb -= rrrPenalty;
+        }
+      }
+    }
+
+    // Keep between 1% and 99% unless mathematically settled
+    battingProb = Math.max(1, Math.min(99, battingProb));
+    battingProb = Math.round(battingProb);
+
+    const bowlingProb = 100 - battingProb;
+
+    // Return mapped to team indexes (0 = Team A, 1 = Team B)
+    if (battingIdx === 0) {
+      return { teamA: battingProb, teamB: bowlingProb };
+    } else {
+      return { teamA: bowlingProb, teamB: battingProb };
+    }
+  }
+
   return {
     createMatch,
     getBattingTeam,
@@ -398,6 +487,7 @@ const CricketEngine = (() => {
     getRequiredRuns,
     getPlayersRemaining,
     getOversDisplay,
+    getWinProbability,
     undo
   };
 })();
