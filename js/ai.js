@@ -14,8 +14,12 @@ const AI = (() => {
   
   let isMuted = localStorage.getItem('ai_commentary_muted') === 'true';
   let lastSpokenText = '';
+  let speechUnlocked = false;
+  let voicesLoaded = false;
 
   function init() {
+    loadVoices();
+
     // Set up speaker buttons for local and tournament scoreboards
     ['local', 'tournament'].forEach(mode => {
       const btn = document.getElementById(`${mode}-ai-speak-btn`);
@@ -23,6 +27,7 @@ const AI = (() => {
         updateSpeakButtonUI(btn);
         btn.addEventListener('click', (e) => {
           e.stopPropagation(); // don't trigger overlay dismiss
+          const wasMuted = isMuted;
           isMuted = !isMuted;
           localStorage.setItem('ai_commentary_muted', isMuted);
           
@@ -34,27 +39,75 @@ const AI = (() => {
 
           if (isMuted) {
             window.speechSynthesis.cancel();
+            return;
+          }
+
+          unlockSpeech();
+
+          // When the user turns sound back on, speak the visible commentary once
+          // so they immediately know audio is working.
+          const currentText = getVisibleCommentaryText();
+          if (currentText && (wasMuted || currentText === lastSpokenText)) {
+            speakIfEnabled(currentText, false, true);
           }
         });
       }
     });
 
-    // Warm up speech synthesis (needed for some mobile browsers)
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.getVoices();
-    }
-
-    // Unmute/unlock speech engine on first user tap/click
+    // Unlock speech on the first real user interaction. Empty utterances are
+    // ignored by some mobile browsers, so use an almost-silent short utterance.
     const unlockSpeech = () => {
-      if ('speechSynthesis' in window) {
-        const u = new SpeechSynthesisUtterance('');
-        window.speechSynthesis.speak(u);
-      }
+      unlockSpeechEngine();
       document.removeEventListener('click', unlockSpeech);
       document.removeEventListener('touchstart', unlockSpeech);
     };
     document.addEventListener('click', unlockSpeech);
     document.addEventListener('touchstart', unlockSpeech);
+  }
+
+  function loadVoices() {
+    if (!('speechSynthesis' in window)) return [];
+
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length) voicesLoaded = true;
+
+    window.speechSynthesis.onvoiceschanged = () => {
+      voicesLoaded = true;
+    };
+
+    return voices;
+  }
+
+  function unlockSpeechEngine() {
+    if (!('speechSynthesis' in window) || speechUnlocked) return;
+
+    try {
+      loadVoices();
+      const utterance = new SpeechSynthesisUtterance('.');
+      utterance.volume = 0.01;
+      utterance.rate = 1.4;
+      utterance.onstart = () => { speechUnlocked = true; };
+      utterance.onend = () => { speechUnlocked = true; };
+      window.speechSynthesis.speak(utterance);
+    } catch (e) {
+      console.warn('Speech unlock failed:', e);
+    }
+  }
+
+  function getVisibleCommentaryText() {
+    const visibleBox = ['local', 'tournament']
+      .map(mode => ({
+        section: document.getElementById(`${mode}-ai-commentary-section`),
+        textBox: document.getElementById(`${mode}-ai-commentary-text`)
+      }))
+      .find(({ section, textBox }) => {
+        if (!section || !textBox) return false;
+        return section.style.display !== 'none' && textBox.textContent.trim();
+      });
+
+    if (!visibleBox) return '';
+    const text = visibleBox.textBox.textContent.trim();
+    return text.includes('Waiting for') || text.includes('thinking') ? '' : text;
   }
 
   function updateSpeakButtonUI(btn) {
@@ -178,20 +231,20 @@ Match Info:
   /**
    * Speaks the commentary aloud if sound is enabled
    */
-  function speakIfEnabled(text, skipSpeech = false) {
+  function speakIfEnabled(text, skipSpeech = false, force = false) {
     if (isMuted || !text) return;
     if (skipSpeech) {
       lastSpokenText = text;
       return;
     }
-    if (text === lastSpokenText) return;
+    if (!force && text === lastSpokenText) return;
     if (!('speechSynthesis' in window)) return;
 
     lastSpokenText = text;
     window.speechSynthesis.cancel(); // cancel any active speech
 
     const utterance = new SpeechSynthesisUtterance(text);
-    const voices = window.speechSynthesis.getVoices();
+    const voices = loadVoices();
 
     // Prefer Indian English / Hindi voices for best Hinglish accent
     const preferredVoice = voices.find(v => v.lang.includes('hi-IN')) || 
@@ -206,8 +259,19 @@ Match Info:
 
     utterance.rate = 1.05; // natural talking pace
     utterance.pitch = 1.0;
+    utterance.volume = 1;
+    utterance.onerror = (event) => {
+      console.warn('AI commentary speech failed:', event.error || event);
+      speechUnlocked = false;
+    };
 
-    window.speechSynthesis.speak(utterance);
+    const speakNow = () => window.speechSynthesis.speak(utterance);
+
+    if (!voicesLoaded && !voices.length) {
+      setTimeout(speakNow, 150);
+    } else {
+      speakNow();
+    }
   }
 
   /**
