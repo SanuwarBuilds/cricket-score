@@ -496,7 +496,7 @@ const Animations = (() => {
     }
 
     // Trigger wicketkeeper catch action (if ball reaches keeper)
-    if (keeper && (runs === 0 || runs === 'dot' || runs === 'out')) {
+    if (keeper && (runs === 0 || runs === 'dot' || runs === 'out' || runs === 'wide')) {
       setTimeout(() => {
         keeper.classList.remove('is-catching');
         void keeper.offsetWidth;
@@ -510,18 +510,25 @@ const Animations = (() => {
       setTimeout(() => {
         if (leftStumps) {
           leftStumps.classList.remove('led-glow');
+          leftStumps.classList.remove('stump-break');
           void leftStumps.offsetWidth;
           leftStumps.classList.add('led-glow');
-          setTimeout(() => leftStumps.classList.remove('led-glow'), 2500);
+          leftStumps.classList.add('stump-break');
+          setTimeout(() => {
+            leftStumps.classList.remove('led-glow');
+            leftStumps.classList.remove('stump-break');
+          }, 2500);
         }
       }, 700);
     }
 
     // Boundary event text overlay
-    if (runs === 4 || runs === 6) {
+    if (runs === 4 || runs === 6 || runs === 'out' || runs === 'wide' || runs === 'noball') {
       setTimeout(() => {
-        eventOverlay.innerHTML = runs === 4 ? 'FOUR' : 'SIX';
-        eventOverlay.classList.add(runs === 4 ? 'show-four' : 'show-six');
+        const labels = { 4: 'FOUR', 6: 'SIX', out: 'OUT', wide: 'WIDE', noball: 'NO BALL' };
+        const classes = { 4: 'show-four', 6: 'show-six', out: 'show-out', wide: 'show-wide', noball: 'show-noball' };
+        eventOverlay.innerHTML = labels[runs];
+        eventOverlay.classList.add(classes[runs]);
       }, 700);
     }
 
@@ -542,6 +549,10 @@ const Animations = (() => {
         ball.classList.add('animate-dot');
       } else if (runs === 'out') {
         ball.classList.add('animate-out');
+      } else if (runs === 'wide') {
+        ball.classList.add('animate-wide');
+      } else if (runs === 'noball') {
+        ball.classList.add('animate-noball');
       } else if (runs === 4) {
         ball.classList.add('animate-four');
       } else if (runs === 6) {

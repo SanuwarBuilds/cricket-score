@@ -144,6 +144,9 @@ const LocalMode = (() => {
           if (type && type.startsWith('run')) {
              const runs = parseInt(type.replace('run',''));
              Animations.playPitchAnimation(runs, 'local');
+          } else if (['four', 'six', 'out', 'wide', 'noball'].includes(type)) {
+             const pitchEvent = type === 'four' ? 4 : type === 'six' ? 6 : type;
+             Animations.playPitchAnimation(pitchEvent, 'local');
           }
         }
         // Preserve local history (since it's not synced from Firebase)
@@ -206,6 +209,9 @@ const LocalMode = (() => {
           if (type && type.startsWith('run')) {
              const runs = parseInt(type.replace('run',''));
              Animations.playPitchAnimation(runs, 'local');
+          } else if (['four', 'six', 'out', 'wide', 'noball'].includes(type)) {
+             const pitchEvent = type === 'four' ? 4 : type === 'six' ? 6 : type;
+             Animations.playPitchAnimation(pitchEvent, 'local');
           }
         }
         // Preserve local history
@@ -247,6 +253,7 @@ const LocalMode = (() => {
       _clearPendingUI();
 
       if (animType) Animations.show(animType);
+      if (animType) Animations.playPitchAnimation(animType, 'local');
       _animateScore();
       updateScoreboard();
       if (isAuthenticated) {
@@ -300,11 +307,13 @@ const LocalMode = (() => {
         if (matchState.wideRunEnabled) {
           // Toggle ON: auto +1 run immediately, no pending mode, no extra run prompt
           CricketEngine.addWide(matchState, 0);
+          Animations.playPitchAnimation('wide', 'local');
           animType = 'wide';
           break;
         }
         // Toggle OFF: animation only, zero score change
         Animations.show('wide');
+        Animations.playPitchAnimation('wide', 'local');
         return;
       case 'noball':
         if (matchState.noBallRunEnabled) {
@@ -315,6 +324,7 @@ const LocalMode = (() => {
         }
         // Toggle OFF: animation only, zero score change
         Animations.show('noball');
+        Animations.playPitchAnimation('noball', 'local');
         return;
       case 'out':
         // If pending, cancel pending first

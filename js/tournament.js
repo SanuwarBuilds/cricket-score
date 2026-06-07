@@ -189,6 +189,9 @@ const TournamentMode = (() => {
           if (type && type.startsWith('run')) {
              const runs = parseInt(type.replace('run',''));
              Animations.playPitchAnimation(runs, 'tournament');
+          } else if (['four', 'six', 'out', 'wide', 'noball'].includes(type)) {
+             const pitchEvent = type === 'four' ? 4 : type === 'six' ? 6 : type;
+             Animations.playPitchAnimation(pitchEvent, 'tournament');
           }
         }
         // Preserve local history (since it's not synced from Firebase)
@@ -254,6 +257,9 @@ const TournamentMode = (() => {
           if (type && type.startsWith('run')) {
              const runs = parseInt(type.replace('run',''));
              Animations.playPitchAnimation(runs, 'tournament');
+          } else if (['four', 'six', 'out', 'wide', 'noball'].includes(type)) {
+             const pitchEvent = type === 'four' ? 4 : type === 'six' ? 6 : type;
+             Animations.playPitchAnimation(pitchEvent, 'tournament');
           }
         }
         // Preserve local history
@@ -286,8 +292,8 @@ const TournamentMode = (() => {
       case '4':    CricketEngine.addRuns(matchState, 4); Animations.playPitchAnimation(4, 'tournament'); animType = 'four'; break;
       case '5':    CricketEngine.addRuns(matchState, 5); break;
       case '6':    CricketEngine.addRuns(matchState, 6); Animations.playPitchAnimation(6, 'tournament'); animType = 'six'; break;
-      case 'wide': CricketEngine.addWide(matchState, 0); animType = 'wide'; break;
-      case 'noball': CricketEngine.addNoBall(matchState, 0); animType = 'noball'; break;
+      case 'wide': CricketEngine.addWide(matchState, 0); Animations.playPitchAnimation('wide', 'tournament'); animType = 'wide'; break;
+      case 'noball': CricketEngine.addNoBall(matchState, 0); Animations.playPitchAnimation('noball', 'tournament'); animType = 'noball'; break;
       case 'out':  CricketEngine.addWicket(matchState); Animations.playPitchAnimation('out', 'tournament'); animType = 'out'; break;
       case 'extrarun': CricketEngine.addExtraRun(matchState); break;
       case 'undo': 
