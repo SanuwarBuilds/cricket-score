@@ -5790,54 +5790,61 @@ body.theme-basic .winner-msg-banner {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
-  padding: 12px;
-  margin: 12px var(--container-padding) 0;
+  padding: 8px 12px;
+  margin: 12px auto 0;
+  max-width: 260px; /* Slimmer centered width */
   text-align: center;
 }
 
-.win-prob-header {
-  font-size: 0.72rem;
+.win-prob-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 0.65rem;
   font-weight: 700;
-  color: var(--text-secondary);
-  letter-spacing: 1.5px;
-  margin-bottom: 8px;
-  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.win-prob-team-a {
+  color: var(--team-a-color, #3b82f6);
+  text-align: left;
+  flex: 1;
+}
+
+.win-prob-title {
+  color: var(--text-muted);
+  font-size: 0.58rem;
+  letter-spacing: 1px;
+  flex: 1;
+  text-align: center;
+  font-weight: 800;
+}
+
+.win-prob-team-b {
+  color: var(--team-b-color, #ef4444);
+  text-align: right;
+  flex: 1;
 }
 
 .win-prob-bar-container {
   display: flex;
-  height: 24px;
-  border-radius: 12px;
+  height: 6px; /* Sleek progress line */
+  border-radius: 3px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.05);
-  position: relative;
 }
 
 .win-prob-bar {
-  display: flex;
-  align-items: center;
+  height: 100%;
   transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #fff;
-  padding: 0 12px;
-  white-space: nowrap;
 }
 
 .win-prob-bar.team-a-bar {
-  justify-content: flex-start;
-  background: linear-gradient(90deg, var(--team-a-color, #3b82f6), rgba(59, 130, 246, 0.85));
-  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+  background: var(--team-a-color, #3b82f6);
 }
 
 .win-prob-bar.team-b-bar {
-  justify-content: flex-end;
-  background: linear-gradient(90deg, rgba(239, 68, 68, 0.85), var(--team-b-color, #ef4444));
-  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+  background: var(--team-b-color, #ef4444);
   margin-left: auto;
-}
-
-.win-prob-label {
-  overflow: hidden;
-  text-overflow: ellipsis;
 }

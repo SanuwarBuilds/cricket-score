@@ -459,11 +459,8 @@ const TournamentMode = (() => {
         winProbA.style.width = `${probs.teamA}%`;
         winProbB.style.width = `${probs.teamB}%`;
 
-        winProbAText.textContent = `${matchState.teams[0].name}: ${probs.teamA}%`;
-        winProbBText.textContent = `${probs.teamB}% :${matchState.teams[1].name}`;
-
-        winProbAText.style.visibility = probs.teamA < 12 ? 'hidden' : 'visible';
-        winProbBText.style.visibility = probs.teamB < 12 ? 'hidden' : 'visible';
+        winProbAText.textContent = `${matchState.teams[0].name} ${probs.teamA}%`;
+        winProbBText.textContent = `${probs.teamB}% ${matchState.teams[1].name}`;
       } else {
         winProbSection.style.display = 'none';
       }
