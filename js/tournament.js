@@ -153,7 +153,6 @@ const TournamentMode = (() => {
 
     isAuthenticated = true; // Auto-authenticate the host creator
     updateAuthBanner();
-    AI.setLastSpokenText('');
     updateScoreboard();
     renderPlayerList();
     
@@ -219,7 +218,6 @@ const TournamentMode = (() => {
     matchState = data;
     isAuthenticated = false;
     updateAuthBanner();
-    AI.setLastSpokenText(data ? data.aiCommentary : '');
     updateScoreboard();
     renderPlayerList();
     
@@ -323,9 +321,7 @@ const TournamentMode = (() => {
       }
       FirebaseSync.syncState(matchState);
 
-      if (action !== 'undo') {
-        AI.generateCommentary(matchState, 'tournament');
-      }
+
 
       if (matchState.isMatchOver && !matchState.historySaved) {
         matchState.historySaved = true;
@@ -473,25 +469,7 @@ const TournamentMode = (() => {
       }
     }
 
-    // Update AI Commentary display
-    const aiCommentarySection = el('tournament-ai-commentary-section');
-    const aiCommentaryText = el('tournament-ai-commentary-text');
-    if (aiCommentarySection && aiCommentaryText) {
-      if (matchState.aiCommentary) {
-        aiCommentarySection.style.display = 'block';
-        aiCommentaryText.textContent = matchState.aiCommentary;
-        const isUndo = matchState.lastEvent && matchState.lastEvent.type === 'undo';
-        AI.speakIfEnabled(matchState.aiCommentary, isUndo);
-      } else {
-        const battingTeam = CricketEngine.getBattingTeam(matchState);
-        if (battingTeam.ballHistory && battingTeam.ballHistory.length > 0) {
-          aiCommentarySection.style.display = 'block';
-          aiCommentaryText.textContent = "Waiting for the next ball...";
-        } else {
-          aiCommentarySection.style.display = 'none';
-        }
-      }
-    }
+
 
     // Draw/update stats charts
     App.updateCharts(matchState, 'tournament');

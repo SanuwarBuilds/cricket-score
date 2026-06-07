@@ -110,7 +110,6 @@ const LocalMode = (() => {
 
     isAuthenticated = true; // Auto-authenticate the host creator
     updateAuthBanner();
-    AI.setLastSpokenText('');
     updateScoreboard();
     // Clear old celebration
     const bg = document.getElementById('celebration-bg');
@@ -172,7 +171,6 @@ const LocalMode = (() => {
     matchState = data;
     isAuthenticated = false;
     updateAuthBanner();
-    AI.setLastSpokenText(data ? data.aiCommentary : '');
     updateScoreboard();
     
     // Clear old celebration
@@ -254,7 +252,6 @@ const LocalMode = (() => {
       if (isAuthenticated) {
         if (animType) matchState.lastEvent = { type: animType, timestamp: Date.now() };
         FirebaseSync.syncState(matchState);
-        AI.generateCommentary(matchState, 'local');
       }
       if (matchState.isMatchOver) setTimeout(() => showMatchEnd(), 1200);
       return;
@@ -366,9 +363,7 @@ const LocalMode = (() => {
       }
       FirebaseSync.syncState(matchState);
 
-      if (action !== 'undo') {
-        AI.generateCommentary(matchState, 'local');
-      }
+
 
       if (matchState.isMatchOver && !matchState.historySaved) {
         matchState.historySaved = true;
@@ -552,25 +547,7 @@ const LocalMode = (() => {
       }
     }
 
-    // Update AI Commentary display
-    const aiCommentarySection = el('local-ai-commentary-section');
-    const aiCommentaryText = el('local-ai-commentary-text');
-    if (aiCommentarySection && aiCommentaryText) {
-      if (matchState.aiCommentary) {
-        aiCommentarySection.style.display = 'block';
-        aiCommentaryText.textContent = matchState.aiCommentary;
-        const isUndo = matchState.lastEvent && matchState.lastEvent.type === 'undo';
-        AI.speakIfEnabled(matchState.aiCommentary, isUndo);
-      } else {
-        const battingTeam = CricketEngine.getBattingTeam(matchState);
-        if (battingTeam.ballHistory && battingTeam.ballHistory.length > 0) {
-          aiCommentarySection.style.display = 'block';
-          aiCommentaryText.textContent = "Waiting for the next ball...";
-        } else {
-          aiCommentarySection.style.display = 'none';
-        }
-      }
-    }
+
 
     // Draw/update stats charts
     App.updateCharts(matchState, 'local');
